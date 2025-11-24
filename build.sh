@@ -26,6 +26,9 @@ echo "Updated version in settings.py"
 echo "Adding settings.py to commit..."
 git add todo/settings.py
 
+echo "Committing changes..."
+git commit -m "Bump version to $VERSION"
+
 echo "Tagging commit..."
 git tag -a v$VERSION -m "Release version $VERSION"
 
