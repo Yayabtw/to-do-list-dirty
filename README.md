@@ -53,11 +53,15 @@ Les numéros de version sont mis à jour en fonction des changements introduits 
 ### Prérequis
 - Python 3.9 ou supérieur
 - pipenv
+- Node.js et npm (pour les tests d'accessibilité)
 
 ### Installation
 ```bash
-# Installer les dépendances
+# Installer les dépendances Python
 pipenv install --dev
+
+# Installer les dépendances Node.js (pour les tests d'accessibilité)
+npm install
 
 # Appliquer les migrations
 pipenv run python manage.py migrate

@@ -4,8 +4,13 @@ Ce document décrit les tests d'accessibilité mis en place pour garantir la con
 
 ## Outils utilisés
 
-- **pa11y** : Outil de test d'accessibilité automatisé
+### Solution principale (recommandée)
+- **pa11y** : Outil de test d'accessibilité automatisé (Node.js)
 - **pa11y-ci** : Version CI/CD de pa11y pour l'intégration continue
+
+### Alternative Python (optionnelle)
+- **axe-selenium-python** : Alternative 100% Python
+- Voir [ACCESSIBILITY_TOOLS.md](ACCESSIBILITY_TOOLS.md) pour plus de détails
 
 ## Standard de conformité
 

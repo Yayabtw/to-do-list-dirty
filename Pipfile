@@ -10,6 +10,9 @@ django = "*"
 ruff = "*"
 coverage = "*"
 tox = "*"
+# Alternative Python pour les tests d'accessibilité (optionnel, pa11y recommandé)
+# axe-selenium-python = "*"
+# selenium = "*"
 
 [requires]
 python_version = "3.13"
