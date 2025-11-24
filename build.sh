@@ -17,6 +17,16 @@ fi
 
 
 echo "Building version: $VERSION"
+
+# Run linter
+echo "Running linter..."
+pipenv run ruff check .
+if [ $? -ne 0 ]; then
+  echo "Error: Linter failed. Please fix the errors before building."
+  exit 1
+fi
+echo "Linter passed!"
+
 tmpfile=$(mktemp)
 awk -v ver="$VERSION" '/^VERSION = / {$0="VERSION = \x27"ver"\x27"} {print}' todo/settings.py > "$tmpfile" && mv "$tmpfile" todo/settings.py
 echo "Updated version in settings.py"

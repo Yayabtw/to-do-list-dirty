@@ -45,3 +45,67 @@ Nous utilisons la version sémantique (**Semantic Versioning / SemVer**), au for
   - Ex : `1.2.3` → `1.2.4`
 
 Les numéros de version sont mis à jour en fonction des changements introduits dans le projet, afin de refléter clairement l’impact pour les utilisateurs et les développeurs.
+
+---
+
+## Installation et Développement
+
+### Prérequis
+- Python 3.9 ou supérieur
+- pipenv
+
+### Installation
+```bash
+# Installer les dépendances
+pipenv install --dev
+
+# Appliquer les migrations
+pipenv run python manage.py migrate
+
+# Charger le dataset de test (optionnel)
+pipenv run python manage.py loaddata dataset.json
+
+# Lancer le serveur de développement
+pipenv run python manage.py runserver
+```
+
+### Qualité du Code
+
+Le projet utilise **Ruff** comme linter pour garantir la qualité du code selon PEP 8.
+
+```bash
+# Vérifier le code
+pipenv run ruff check .
+
+# Corriger automatiquement les erreurs
+pipenv run ruff check --fix .
+```
+
+### Tests
+
+Le projet dispose d'une suite de tests complète avec **100% de couverture**.
+
+```bash
+# Lancer les tests
+pipenv run python manage.py test tasks.tests
+
+# Générer le rapport de couverture
+pipenv run coverage run --source='.' manage.py test tasks.tests
+pipenv run coverage report
+pipenv run coverage html
+```
+
+Pour plus de détails sur les tests, voir [TESTING.md](TESTING.md).
+
+### Build et Release
+
+```bash
+# Créer une nouvelle version
+./build.sh version=X.Y.Z
+```
+
+Le script de build :
+1. Vérifie que le code passe le linter
+2. Met à jour la version dans `settings.py`
+3. Crée un commit et un tag Git
+4. Génère une archive versionnée

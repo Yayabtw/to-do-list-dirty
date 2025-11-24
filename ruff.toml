@@ -1,0 +1,23 @@
+# Ruff configuration
+line-length = 100
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+]
+
+ignore = [
+    "E501",  # line too long (handled by formatter)
+]
+
+[lint.per-file-ignores]
+"__init__.py" = ["F401"]  # unused imports in __init__.py
+"*/migrations/*.py" = ["E501", "N806"]  # Django migrations
+"manage.py" = ["E402"]  # module level import not at top
+"*/settings.py" = ["E501"]  # long lines in settings

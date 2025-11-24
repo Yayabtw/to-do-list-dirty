@@ -6,3 +6,20 @@ __pycache__/
 .DS_Store
 .env.local
 *.log
+
+# Coverage
+.coverage
+htmlcov/
+coverage.xml
+.coverage.*
+
+# Tox
+.tox/
+
+# Build artifacts
+*.zip
+todolist-*.zip
+
+# IDE
+.vscode/
+.idea/
