@@ -97,6 +97,18 @@ pipenv run coverage html
 
 Pour plus de détails sur les tests, voir [TESTING.md](TESTING.md).
 
+### Accessibilité
+
+L'application est conforme au standard **WCAG 2.1 niveau A**.
+
+```bash
+# Lancer les tests d'accessibilité
+# (le serveur Django doit être en cours d'exécution)
+./test_accessibility.sh
+```
+
+Pour plus de détails, voir [ACCESSIBILITY.md](ACCESSIBILITY.md).
+
 ### Build et Release
 
 ```bash
@@ -106,6 +118,7 @@ Pour plus de détails sur les tests, voir [TESTING.md](TESTING.md).
 
 Le script de build :
 1. Vérifie que le code passe le linter
-2. Met à jour la version dans `settings.py`
-3. Crée un commit et un tag Git
-4. Génère une archive versionnée
+2. Vérifie la conformité WCAG 2.1 niveau A (accessibilité)
+3. Met à jour la version dans `settings.py`
+4. Crée un commit et un tag Git
+5. Génère une archive versionnée

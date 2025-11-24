@@ -27,6 +27,19 @@ if [ $? -ne 0 ]; then
 fi
 echo "Linter passed!"
 
+# Run accessibility tests
+echo ""
+echo "Running accessibility tests..."
+echo "Note: Make sure the Django server is running on http://localhost:8000/"
+echo "If not, start it with: pipenv run python manage.py runserver"
+echo ""
+./test_accessibility.sh
+if [ $? -ne 0 ]; then
+  echo "Error: Accessibility tests failed. Please fix the issues before building."
+  exit 1
+fi
+echo "Accessibility tests passed!"
+
 tmpfile=$(mktemp)
 awk -v ver="$VERSION" '/^VERSION = / {$0="VERSION = \x27"ver"\x27"} {print}' todo/settings.py > "$tmpfile" && mv "$tmpfile" todo/settings.py
 echo "Updated version in settings.py"

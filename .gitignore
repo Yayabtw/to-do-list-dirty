@@ -22,4 +22,8 @@ todolist-*.zip
 
 # IDE
 .vscode/
+
+# Node modules
+node_modules/
+package-lock.json
 .idea/
