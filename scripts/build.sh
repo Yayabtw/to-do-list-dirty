@@ -2,6 +2,14 @@
 
 # Build script for to-do-list-dirty
 
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get the project root directory (parent of scripts/)
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Change to project root
+cd "$PROJECT_ROOT"
+
 # Version parameter
 if [[ -z "$1" || "$1" != version=* ]]; then
   echo "Usage: $0 version=X.Y.Z"
@@ -33,7 +41,7 @@ echo "Running accessibility tests..."
 echo "Note: Make sure the Django server is running on http://localhost:8000/"
 echo "If not, start it with: pipenv run python manage.py runserver"
 echo ""
-./test_accessibility.sh
+"$SCRIPT_DIR/test_accessibility.sh"
 if [ $? -ne 0 ]; then
   echo "Error: Accessibility tests failed. Please fix the issues before building."
   exit 1
@@ -59,7 +67,10 @@ echo "Created tag v$VERSION"
 echo "Pushing tag to remote..."
 git push origin v$VERSION
 
+# Create releases directory if it doesn't exist
+mkdir -p releases
+
 echo "Creating zip archive..."
-git archive --format=zip --output="todolist-v$VERSION.zip" HEAD
-echo "Zip archive created: todolist-v$VERSION.zip"
+git archive --format=zip --output="releases/todolist-v$VERSION.zip" HEAD
+echo "Zip archive created: releases/todolist-v$VERSION.zip"
 

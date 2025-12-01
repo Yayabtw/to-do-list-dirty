@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from tests.decorators import tc
 
 from .models import Task
 
@@ -12,6 +13,7 @@ class TaskViewsTestCase(TestCase):
         self.task1 = Task.objects.create(title="Test Task 1", complete=False)
         self.task2 = Task.objects.create(title="Test Task 2", complete=True)
 
+    @tc("1")
     def test_index_view(self):
         """Test the index view (/)."""
         response = self.client.get(reverse('list'))
@@ -20,12 +22,14 @@ class TaskViewsTestCase(TestCase):
         self.assertContains(response, "Test Task 2")
         self.assertTemplateUsed(response, 'tasks/list.html')
 
+    @tc("2")
     def test_index_view_post(self):
         """Test creating a task via POST to index view."""
         response = self.client.post(reverse('list'), {'title': 'New Task'})
         self.assertEqual(response.status_code, 302)  # Redirect
         self.assertTrue(Task.objects.filter(title='New Task').exists())
 
+    @tc("3")
     def test_update_task_view_get(self):
         """Test the update task view GET request."""
         response = self.client.get(
@@ -35,6 +39,7 @@ class TaskViewsTestCase(TestCase):
         self.assertTemplateUsed(response, 'tasks/update_task.html')
         self.assertContains(response, "Test Task 1")
 
+    @tc("4")
     def test_update_task_view_post(self):
         """Test updating a task via POST."""
         response = self.client.post(
@@ -46,6 +51,7 @@ class TaskViewsTestCase(TestCase):
         self.assertEqual(self.task1.title, 'Updated Task')
         self.assertTrue(self.task1.complete)
 
+    @tc("5")
     def test_delete_task_view_get(self):
         """Test the delete task view GET request."""
         response = self.client.get(
@@ -54,6 +60,7 @@ class TaskViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'tasks/delete.html')
 
+    @tc("6")
     def test_delete_task_view_post(self):
         """Test deleting a task via POST."""
         task_id = self.task1.id
@@ -67,6 +74,7 @@ class TaskViewsTestCase(TestCase):
 class TaskModelTestCase(TestCase):
     """Test case for Task model."""
 
+    @tc("7")
     def test_task_creation(self):
         """Test creating a task."""
         task = Task.objects.create(title="Test Task")
@@ -74,6 +82,7 @@ class TaskModelTestCase(TestCase):
         self.assertFalse(task.complete)
         self.assertIsNotNone(task.created)
 
+    @tc("8")
     def test_task_str(self):
         """Test the string representation of a task."""
         task = Task.objects.create(title="Test Task")
@@ -85,6 +94,7 @@ class DatasetImportTestCase(TestCase):
 
     fixtures = ['dataset.json']
 
+    @tc("9")
     def test_dataset_import(self):
         """Test that the dataset is correctly imported."""
         # Check that tasks were imported

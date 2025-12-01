@@ -1,0 +1,146 @@
+tests:
+  - numero: 1
+    nom: "Test d'affichage de la liste des tâches"
+    type: "auto-unittest"
+    description: "Vérifier que la page d'accueil affiche correctement toutes les tâches"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_index_view"
+    ligne: 15
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_index_view"
+
+  - numero: 2
+    nom: "Test de création d'une tâche"
+    type: "auto-unittest"
+    description: "Vérifier la création d'une nouvelle tâche via POST"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_index_view_post"
+    ligne: 23
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_index_view_post"
+
+  - numero: 3
+    nom: "Test d'affichage du formulaire de modification"
+    type: "auto-unittest"
+    description: "Vérifier l'affichage de la page de modification d'une tâche"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_update_task_view_get"
+    ligne: 29
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_update_task_view_get"
+
+  - numero: 4
+    nom: "Test de modification d'une tâche"
+    type: "auto-unittest"
+    description: "Vérifier la modification d'une tâche existante"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_update_task_view_post"
+    ligne: 38
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_update_task_view_post"
+
+  - numero: 5
+    nom: "Test d'affichage de la confirmation de suppression"
+    type: "auto-unittest"
+    description: "Vérifier l'affichage de la page de confirmation de suppression"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_delete_task_view_get"
+    ligne: 49
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_delete_task_view_get"
+
+  - numero: 6
+    nom: "Test de suppression d'une tâche"
+    type: "auto-unittest"
+    description: "Vérifier la suppression effective d'une tâche"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_delete_task_view_post"
+    ligne: 57
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_delete_task_view_post"
+
+  - numero: 7
+    nom: "Test du modèle Task"
+    type: "auto-unittest"
+    description: "Vérifier la création d'un objet Task et ses valeurs par défaut"
+    fichier: "tasks/tests.py"
+    methode: "TaskModelTestCase.test_task_creation"
+    ligne: 70
+    commande: "pipenv run python manage.py test tasks.tests.TaskModelTestCase.test_task_creation"
+
+  - numero: 8
+    nom: "Test de la représentation string du modèle"
+    type: "auto-unittest"
+    description: "Vérifier que la méthode __str__ retourne le titre"
+    fichier: "tasks/tests.py"
+    methode: "TaskModelTestCase.test_task_str"
+    ligne: 77
+    commande: "pipenv run python manage.py test tasks.tests.TaskModelTestCase.test_task_str"
+
+  - numero: 9
+    nom: "Test d'import du dataset"
+    type: "auto-unittest"
+    description: "Vérifier que le fixture dataset.json se charge correctement"
+    fichier: "tasks/tests.py"
+    methode: "DatasetImportTestCase.test_dataset_import"
+    ligne: 88
+    commande: "pipenv run python manage.py test tasks.tests.DatasetImportTestCase.test_dataset_import"
+
+  - numero: 10
+    nom: "Test de conformité WCAG 2.1 niveau A"
+    type: "auto-unittest"
+    description: "Vérifier la conformité d'accessibilité de toutes les pages"
+    fichier: "scripts/test_accessibility.sh"
+    commande: "./scripts/test_accessibility.sh"
+    prerequis: "Serveur Django en cours d'exécution"
+
+  - numero: 11
+    nom: "Test de création d'une tâche vide"
+    type: "manuel"
+    description: "Vérifier le comportement lors d'une tentative de création d'une tâche sans titre"
+    categorie: "Test fonctionnel négatif"
+    procedure:
+      - "Accéder à http://localhost:8000/"
+      - "Cliquer sur 'Créer une tâche' sans remplir le champ"
+      - "Observer le comportement"
+    resultat_attendu: "Message d'erreur ou validation HTML5 empêchant la soumission"
+
+  - numero: 12
+    nom: "Test de modification d'une tâche inexistante"
+    type: "manuel"
+    description: "Vérifier le comportement lors de l'accès à une tâche inexistante"
+    categorie: "Test d'erreur"
+    procedure:
+      - "Accéder à http://localhost:8000/update_task/99999/"
+      - "Observer le comportement"
+    resultat_attendu: "Page d'erreur 404 ou message approprié"
+
+  - numero: 13
+    nom: "Test d'affichage des tâches complétées"
+    type: "manuel"
+    description: "Vérifier le style visuel des tâches marquées comme complétées"
+    categorie: "Contrôle visuel"
+    procedure:
+      - "Accéder à http://localhost:8000/"
+      - "Créer une nouvelle tâche"
+      - "La modifier pour la marquer comme complétée (cocher la case 'complete')"
+      - "Retourner à la liste"
+    resultat_attendu: "Tâche barrée (line-through) avec opacité réduite (0.8)"
+
+  - numero: 14
+    nom: "Test de responsive design"
+    type: "manuel"
+    description: "Vérifier l'affichage sur différentes tailles d'écran"
+    categorie: "Contrôle visuel multi-dispositifs"
+    procedure:
+      - "Accéder à http://localhost:8000/"
+      - "Tester sur résolution 375px (mobile)"
+      - "Tester sur résolution 768px (tablette)"
+      - "Tester sur résolution 1920px (desktop)"
+    resultat_attendu: "Contenu lisible sur toutes résolutions, pas de débordement"
+
+  - numero: 15
+    nom: "Test de la persistance des données"
+    type: "manuel"
+    description: "Vérifier que les données persistent après redémarrage du serveur"
+    categorie: "Test d'intégration"
+    procedure:
+      - "Créer 3 nouvelles tâches"
+      - "Arrêter le serveur Django (Ctrl+C)"
+      - "Redémarrer le serveur"
+      - "Accéder à http://localhost:8000/"
+    resultat_attendu: "Les 3 tâches créées sont toujours présentes"
