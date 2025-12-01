@@ -1,0 +1,29 @@
+*.db
+*.sqlite3
+__pycache__/
+*.pyc
+.env
+.DS_Store
+.env.local
+*.log
+
+# Coverage
+.coverage
+htmlcov/
+coverage.xml
+.coverage.*
+
+# Tox
+.tox/
+
+# Build artifacts
+*.zip
+todolist-*.zip
+
+# IDE
+.vscode/
+
+# Node modules
+node_modules/
+package-lock.json
+.idea/

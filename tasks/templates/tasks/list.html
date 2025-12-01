@@ -1,4 +1,11 @@
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Application de gestion de tâches - To Do List">
+	<title>To Do List - Gestion de tâches</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 <style>
 
@@ -18,7 +25,13 @@
 	}
 
 	.submit{
-		background-color: #6BA3E8;
+		background-color: #0056b3;
+	}
+
+	.btn-info{
+		background-color: #0056b3;
+		border-color: #004085;
+		color: #fff;
 	}
 
 	.center-column{
@@ -31,7 +44,7 @@
 	}
 
 	.item-row{
-		background-color: #8338ec;
+		background-color: #5a1fb3;
 		margin: 10px;
 		padding: 20px;
 		border-radius: 3px;
@@ -41,28 +54,36 @@
 	}
 
 	.btn-danger{
-		background-color: #ffbe0b;
-		border-color: #e59400;
+		background-color: #8b5a00;
+		border-color: #6b4400;
+		color: #fff;
+	}
+
+	.task-completed {
+		text-decoration: line-through;
+		opacity: 0.8;
 	}
 
 </style>
-<h1 style="text-align: center; color: #fb5607; font-size: 125px;        text-shadow: -10px 0 black, 0 10px black, 10px 0 black, 0 -10px black;
-
-"><b>TO DO LIST</b></h1>
+</head>
+<body>
+<main>
+<h1 style="text-align: center; color: #fb5607; font-size: 125px; text-shadow: -10px 0 black, 0 10px black, 10px 0 black, 0 -10px black;">TO DO LIST</h1>
 <div  class="center-column">
 	<form method="POST" action="/">
 		{% csrf_token %}
+		<label for="id_title" class="sr-only">Titre de la tâche</label>
 		{{form.title}}
-		<input class="btn btn-info" type="submit" name="Create Task">
+		<input class="btn btn-info" type="submit" value="Créer une tâche" aria-label="Créer une nouvelle tâche">
 	</form>
 
-	<div class="todo-list">
+	<div class="todo-list" role="list" aria-label="Liste des tâches">
 	{% for task in tasks %}
-		<div class="item-row">
-			<a class="btn btn-sm btn-info" href = "{% url 'update_task' task.id %}">Update</a>
-			<a class="btn btn-sm btn-danger" href = "{% url 'delete' task.id %}">Delete</a>
+		<div class="item-row" role="listitem">
+			<a class="btn btn-sm btn-info" href = "{% url 'update_task' task.id %}" aria-label="Modifier la tâche {{ task.title }}">Modifier</a>
+			<a class="btn btn-sm btn-danger" href = "{% url 'delete' task.id %}" aria-label="Supprimer la tâche {{ task.title }}">Supprimer</a>
 			{% if task.complete == True %}
-			<strike>{{task}}</strike>
+			<span class="task-completed">{{task}}</span>
 			{% else %}
 			<span>{{task}}</span>
 			{% endif %}
@@ -70,4 +91,8 @@
 		</div>
 	{% endfor %}
 	</div>
+	<p style="margin-top: 10px; font-size: 12px; color: #666; text-align: right;">Version : {{ version }}</p>
 </div>
+</main>
+</body>
+</html>
