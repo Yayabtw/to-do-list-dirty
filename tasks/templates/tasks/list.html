@@ -79,7 +79,7 @@
 
 	<div class="todo-list" role="list" aria-label="Liste des tâches">
 	{% for task in tasks %}
-		<div class="item-row" role="listitem">
+		<div class="item-row" role="listitem" data-task-id="{{ task.id }}" data-task-title="{{ task.title }}">
 			<a class="btn btn-sm btn-info" href = "{% url 'update_task' task.id %}" aria-label="Modifier la tâche {{ task.title }}">Modifier</a>
 			<a class="btn btn-sm btn-danger" href = "{% url 'delete' task.id %}" aria-label="Supprimer la tâche {{ task.title }}">Supprimer</a>
 			{% if task.complete == True %}
