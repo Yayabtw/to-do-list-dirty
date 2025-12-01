@@ -16,28 +16,28 @@ class JSONTestResult(unittest.TextTestResult):
         super().__init__(*args, **kwargs)
         self.test_results = []
 
-    def start_test(self, test):
+    def startTest(self, test):
         """Called when a test starts."""
-        super().start_test(test)
+        super().startTest(test)
 
-    def add_success(self, test):
+    def addSuccess(self, test):
         """Called when a test passes."""
-        super().add_success(test)
+        super().addSuccess(test)
         self._add_result(test, 'passed', None)
 
-    def add_error(self, test, err):
+    def addError(self, test, err):
         """Called when a test has an error."""
-        super().add_error(test, err)
+        super().addError(test, err)
         self._add_result(test, 'error', self._exc_info_to_string(err, test))
 
-    def add_failure(self, test, err):
+    def addFailure(self, test, err):
         """Called when a test fails."""
-        super().add_failure(test, err)
+        super().addFailure(test, err)
         self._add_result(test, 'failed', self._exc_info_to_string(err, test))
 
-    def add_skip(self, test, reason):
+    def addSkip(self, test, reason):
         """Called when a test is skipped."""
-        super().add_skip(test, reason)
+        super().addSkip(test, reason)
         self._add_result(test, 'skipped', reason)
 
     def _add_result(self, test, status, error_message):
