@@ -1,7 +1,7 @@
 """Test case decorators for tracking test numbers."""
 
 import functools
-from typing import Callable
+from collections.abc import Callable
 
 
 def tc(test_number: str) -> Callable:

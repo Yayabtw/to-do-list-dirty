@@ -4,8 +4,8 @@ import json
 import time
 import unittest
 from datetime import datetime
+
 from django.test.runner import DiscoverRunner
-from django.test import TestCase
 
 
 class JSONTestResult(unittest.TextTestResult):
@@ -16,28 +16,28 @@ class JSONTestResult(unittest.TextTestResult):
         super().__init__(*args, **kwargs)
         self.test_results = []
 
-    def startTest(self, test):
+    def start_test(self, test):
         """Called when a test starts."""
-        super().startTest(test)
+        super().start_test(test)
 
-    def addSuccess(self, test):
+    def add_success(self, test):
         """Called when a test passes."""
-        super().addSuccess(test)
+        super().add_success(test)
         self._add_result(test, 'passed', None)
 
-    def addError(self, test, err):
+    def add_error(self, test, err):
         """Called when a test has an error."""
-        super().addError(test, err)
+        super().add_error(test, err)
         self._add_result(test, 'error', self._exc_info_to_string(err, test))
 
-    def addFailure(self, test, err):
+    def add_failure(self, test, err):
         """Called when a test fails."""
-        super().addFailure(test, err)
+        super().add_failure(test, err)
         self._add_result(test, 'failed', self._exc_info_to_string(err, test))
 
-    def addSkip(self, test, reason):
+    def add_skip(self, test, reason):
         """Called when a test is skipped."""
-        super().addSkip(test, reason)
+        super().add_skip(test, reason)
         self._add_result(test, 'skipped', reason)
 
     def _add_result(self, test, status, error_message):
@@ -113,7 +113,7 @@ class JSONTestRunner(DiscoverRunner):
             json.dump(output, f, indent=2, ensure_ascii=False)
 
         if self.verbosity >= 1:
-            print(f"\n✓ Test results exported to result_test_auto.json")
+            print("\n✓ Test results exported to result_test_auto.json")
             print(f"  Total: {output['total_tests']}, "
                   f"Passed: {output['summary']['passed']}, "
                   f"Failed: {output['summary']['failed']}, "

@@ -30,7 +30,7 @@ def load_test_list(yaml_path='test_list.yaml'):
         Liste des tests
     """
     try:
-        with open(yaml_path, 'r', encoding='utf-8') as f:
+        with open(yaml_path, encoding='utf-8') as f:
             data = yaml.safe_load(f)
             return data.get('tests', [])
     except FileNotFoundError:
@@ -55,7 +55,7 @@ def load_test_results(json_path='result_test_auto.json'):
         return None
 
     try:
-        with open(json_path, 'r', encoding='utf-8') as f:
+        with open(json_path, encoding='utf-8') as f:
             return json.load(f)
     except json.JSONDecodeError as e:
         print(f"⚠️  Avertissement: Erreur lors de la lecture du JSON: {e}")

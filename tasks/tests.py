@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+
 from tests.decorators import tc
 
 from .models import Task
