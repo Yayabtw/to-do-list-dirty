@@ -11,14 +11,14 @@ Status: start, success, failure
 import json
 import os
 import sys
+from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-from urllib.error import URLError, HTTPError
 
 
 def send_discord_notification(webhook_url, status, message, details=None):
     """
     Envoie une notification à Discord via webhook.
-    
+
     Args:
         webhook_url: URL du webhook Discord
         status: 'start', 'success', ou 'failure'
@@ -31,19 +31,19 @@ def send_discord_notification(webhook_url, status, message, details=None):
         'success': 0x2ecc71,  # Vert
         'failure': 0xe74c3c   # Rouge
     }
-    
+
     emojis = {
         'start': '🚀',
         'success': '✅',
         'failure': '❌'
     }
-    
+
     titles = {
         'start': 'CI démarrée',
         'success': 'CI réussie',
         'failure': 'CI échouée'
     }
-    
+
     # Construire l'embed Discord
     embed = {
         'title': f"{emojis.get(status, '📢')} {titles.get(status, 'Notification CI')}",
@@ -52,7 +52,7 @@ def send_discord_notification(webhook_url, status, message, details=None):
         'timestamp': None,  # Discord ajoutera automatiquement
         'fields': []
     }
-    
+
     # Ajouter des détails si fournis
     if details:
         if isinstance(details, dict):
@@ -68,11 +68,11 @@ def send_discord_notification(webhook_url, status, message, details=None):
                 'value': str(details),
                 'inline': False
             })
-    
+
     payload = {
         'embeds': [embed]
     }
-    
+
     # Envoyer la requête
     try:
         req = Request(
@@ -80,7 +80,7 @@ def send_discord_notification(webhook_url, status, message, details=None):
             data=json.dumps(payload).encode('utf-8'),
             headers={'Content-Type': 'application/json'}
         )
-        
+
         with urlopen(req, timeout=10) as response:
             if response.status == 204:
                 print(f"✅ Notification envoyée avec succès ({status})")
@@ -88,7 +88,7 @@ def send_discord_notification(webhook_url, status, message, details=None):
             else:
                 print(f"⚠️ Réponse inattendue: {response.status}")
                 return False
-                
+
     except HTTPError as e:
         print(f"❌ Erreur HTTP: {e.code} - {e.reason}")
         return False
@@ -103,7 +103,7 @@ def send_discord_notification(webhook_url, status, message, details=None):
 def send_slack_notification(webhook_url, status, message, details=None):
     """
     Envoie une notification à Slack via webhook.
-    
+
     Args:
         webhook_url: URL du webhook Slack
         status: 'start', 'success', ou 'failure'
@@ -115,13 +115,13 @@ def send_slack_notification(webhook_url, status, message, details=None):
         'success': '#2ecc71',
         'failure': '#e74c3c'
     }
-    
+
     emojis = {
         'start': '🚀',
         'success': '✅',
         'failure': '❌'
     }
-    
+
     payload = {
         'attachments': [{
             'color': colors.get(status, '#95a5a6'),
@@ -130,7 +130,7 @@ def send_slack_notification(webhook_url, status, message, details=None):
             'fields': []
         }]
     }
-    
+
     if details and isinstance(details, dict):
         for key, value in details.items():
             payload['attachments'][0]['fields'].append({
@@ -138,14 +138,14 @@ def send_slack_notification(webhook_url, status, message, details=None):
                 'value': str(value),
                 'short': True
             })
-    
+
     try:
         req = Request(
             webhook_url,
             data=json.dumps(payload).encode('utf-8'),
             headers={'Content-Type': 'application/json'}
         )
-        
+
         with urlopen(req, timeout=10) as response:
             if response.status == 200:
                 print(f"✅ Notification Slack envoyée avec succès ({status})")
@@ -153,7 +153,7 @@ def send_slack_notification(webhook_url, status, message, details=None):
             else:
                 print(f"⚠️ Réponse inattendue: {response.status}")
                 return False
-                
+
     except Exception as e:
         print(f"❌ Erreur: {e}")
         return False
@@ -166,14 +166,14 @@ def main():
         print("Status: start, success, failure")
         print("Webhook URL peut être fournie via WEBHOOK_URL ou DISCORD_WEBHOOK")
         sys.exit(1)
-    
+
     status = sys.argv[1].lower()
     message = sys.argv[2]
-    
+
     if status not in ['start', 'success', 'failure']:
         print(f"❌ Statut invalide: {status}. Utilisez 'start', 'success', ou 'failure'")
         sys.exit(1)
-    
+
     # Récupérer l'URL du webhook
     webhook_url = None
     if len(sys.argv) >= 4:
@@ -181,19 +181,19 @@ def main():
     else:
         # Essayer les variables d'environnement
         webhook_url = os.getenv('WEBHOOK_URL') or os.getenv('DISCORD_WEBHOOK') or os.getenv('SLACK_WEBHOOK')
-    
+
     if not webhook_url:
         print("⚠️ Aucune URL de webhook fournie. Notification ignorée.")
         print("💡 Configurez WEBHOOK_URL, DISCORD_WEBHOOK ou SLACK_WEBHOOK")
         sys.exit(0)
-    
+
     # Détecter le type de webhook
     webhook_type = 'discord'
     if 'slack.com' in webhook_url or 'hooks.slack.com' in webhook_url:
         webhook_type = 'slack'
     elif 'discord.com' in webhook_url or 'discordapp.com' in webhook_url:
         webhook_type = 'discord'
-    
+
     # Récupérer des détails depuis les variables d'environnement GitHub Actions
     details = {}
     if os.getenv('GITHUB_REPOSITORY'):
@@ -208,7 +208,7 @@ def main():
         run_id = os.getenv('GITHUB_RUN_ID')
         repo = os.getenv('GITHUB_REPOSITORY', '')
         details['Workflow'] = f"[View Run](https://github.com/{repo}/actions/runs/{run_id})"
-    
+
     # Envoyer la notification
     if webhook_type == 'discord':
         success = send_discord_notification(webhook_url, status, message, details)
@@ -217,7 +217,7 @@ def main():
     else:
         print(f"⚠️ Type de webhook non reconnu: {webhook_type}. Tentative avec Discord...")
         success = send_discord_notification(webhook_url, status, message, details)
-    
+
     sys.exit(0 if success else 1)
 
 
