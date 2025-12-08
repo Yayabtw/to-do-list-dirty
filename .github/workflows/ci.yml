@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, dev-quality-system ]
+  pull_request:
+    branches: [ main, dev-quality-system ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: Install Python dependencies
+        run: pipenv install --dev
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Set up ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: Run linter
+        run: pipenv run ruff check . --extend-ignore N802
+
+      - name: Prepare database (SQLite)
+        run: |
+          pipenv run python manage.py migrate
+          pipenv run python manage.py loaddata tasks/fixtures/dataset.json
+
+      - name: Run Django tests (JSON)
+        run: pipenv run python manage.py test tasks.tests --testrunner=tests.json_test_runner.JSONTestRunner
+        continue-on-error: true
+
+      - name: Start Django server
+        env:
+          DJANGO_SETTINGS_MODULE: todo.settings
+        run: |
+          pipenv run python manage.py runserver 127.0.0.1:8000 &
+          sleep 5
+          curl -f http://127.0.0.1:8000/ || exit 1
+
+      - name: Run E2E tests (Selenium)
+        run: |
+          pipenv run python tests/e2e/tc016_crud_10_tasks.py || true
+          pipenv run python tests/e2e/tc017_cross_impact.py || true
+        continue-on-error: true
+
+      - name: Run accessibility tests (pa11y-ci)
+        run: |
+          npx pa11y-ci --config .pa11yci.json --json > result_test_accessibility.json 2>&1 || echo '{"errors": true, "message": "Accessibility tests failed"}' > result_test_accessibility.json
+        continue-on-error: true
+
+      - name: Generate test report (console)
+        run: pipenv run python test_report.py > test_report_output.txt 2>&1 || true
+
+      - name: Generate PR report (Markdown)
+        if: github.event_name == 'pull_request'
+        run: pipenv run python scripts/generate_pr_report.py > pr_report.md 2>&1 || echo '# 📊 Rapport des Tests CI\n\n⚠️ Erreur lors de la génération du rapport.' > pr_report.md
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            result_test_auto.json
+            result_test_selenium.json
+            result_test_accessibility.json
+            test_report_output.txt
+            pr_report.md
+
+      - name: Comment PR with test results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const reportPath = path.join(process.env.GITHUB_WORKSPACE, 'pr_report.md');
+            let comment = '## 📊 Rapport des Tests CI\n\n';
+
+            try {
+              comment = fs.readFileSync(reportPath, 'utf8');
+            } catch (e) {
+              console.log('Erreur lecture rapport:', e);
+              comment += '⚠️ Impossible de générer le rapport complet.\n\n';
+              try {
+                const simpleReport = fs.readFileSync(path.join(process.env.GITHUB_WORKSPACE, 'test_report_output.txt'), 'utf8');
+                comment += '```\n' + simpleReport + '\n```\n';
+              } catch (e2) {
+                comment += 'Aucun rapport disponible.\n';
+              }
+            }
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' &&
+              (c.body.includes('Rapport des Tests CI') || c.body.includes('Résultats des Tests CI'))
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment,
+              });
+            }
+
