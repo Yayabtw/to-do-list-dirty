@@ -28,7 +28,7 @@ jobs:
         run: pip install pipenv
 
       - name: Install Python dependencies
-        run: pipenv install --dev --deploy
+        run: pipenv install --dev
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
