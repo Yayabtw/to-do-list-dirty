@@ -78,7 +78,10 @@ def send_discord_notification(webhook_url, status, message, details=None):
         req = Request(
             webhook_url,
             data=payload_json.encode('utf-8'),
-            headers={'Content-Type': 'application/json'}
+            headers={
+                'Content-Type': 'application/json',
+                'User-Agent': 'CI-Notifier/1.0 (+github-actions)'
+            }
         )
 
         with urlopen(req, timeout=10) as response:
@@ -148,8 +151,11 @@ def send_slack_notification(webhook_url, status, message, details=None):
     try:
         req = Request(
             webhook_url,
-            data=json.dumps(payload).encode('utf-8'),
-            headers={'Content-Type': 'application/json'}
+            data=json.dumps(payload, ensure_ascii=False).encode('utf-8'),
+            headers={
+                'Content-Type': 'application/json',
+                'User-Agent': 'CI-Notifier/1.0 (+github-actions)'
+            }
         )
 
         with urlopen(req, timeout=10) as response:
