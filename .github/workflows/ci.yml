@@ -19,6 +19,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Send notification (start)
+        if: always()
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          pip install pipenv || true
+          pipenv run python scripts/send_notification.py start "🚀 CI démarrée pour ${{ github.repository }} sur ${{ github.ref_name }}" || true
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -143,4 +155,26 @@ jobs:
                 body: comment,
               });
             }
+
+      - name: Send notification (success)
+        if: success()
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          pipenv run python scripts/send_notification.py success "✅ Tous les tests sont passés avec succès !" || true
+
+      - name: Send notification (failure)
+        if: failure()
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          pipenv run python scripts/send_notification.py failure "❌ La CI a échoué. Vérifiez les logs pour plus de détails." || true
 
