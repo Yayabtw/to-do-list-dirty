@@ -49,7 +49,6 @@ def send_discord_notification(webhook_url, status, message, details=None):
         'title': f"{emojis.get(status, '📢')} {titles.get(status, 'Notification CI')}",
         'description': message,
         'color': colors.get(status, 0x95a5a6),
-        'timestamp': None,  # Discord ajoutera automatiquement
         'fields': []
     }
 
@@ -75,22 +74,29 @@ def send_discord_notification(webhook_url, status, message, details=None):
 
     # Envoyer la requête
     try:
+        payload_json = json.dumps(payload, ensure_ascii=False)
         req = Request(
             webhook_url,
-            data=json.dumps(payload).encode('utf-8'),
+            data=payload_json.encode('utf-8'),
             headers={'Content-Type': 'application/json'}
         )
 
         with urlopen(req, timeout=10) as response:
+            response_body = response.read().decode('utf-8')
             if response.status == 204:
                 print(f"✅ Notification envoyée avec succès ({status})")
                 return True
             else:
                 print(f"⚠️ Réponse inattendue: {response.status}")
+                if response_body:
+                    print(f"   Réponse: {response_body}")
                 return False
 
     except HTTPError as e:
+        error_body = e.read().decode('utf-8') if hasattr(e, 'read') else ''
         print(f"❌ Erreur HTTP: {e.code} - {e.reason}")
+        if error_body:
+            print(f"   Détails: {error_body}")
         return False
     except URLError as e:
         print(f"❌ Erreur URL: {e.reason}")
