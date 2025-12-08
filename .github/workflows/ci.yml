@@ -91,6 +91,15 @@ jobs:
         if: github.event_name == 'pull_request'
         run: pipenv run python scripts/generate_pr_report.py > pr_report.md 2>&1 || echo '# 📊 Rapport des Tests CI\n\n⚠️ Erreur lors de la génération du rapport.' > pr_report.md
 
+      - name: Generate delivery certificate PDF
+        if: github.event_name == 'pull_request' && github.base_ref == 'main'
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          pipenv run python scripts/generate_delivery_certificate.py bon_livraison_tests.pdf || echo "⚠️ Erreur lors de la génération du PDF"
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -102,6 +111,7 @@ jobs:
             result_test_accessibility.json
             test_report_output.txt
             pr_report.md
+            bon_livraison_tests.pdf
 
       - name: Comment PR with test results
         if: github.event_name == 'pull_request'
@@ -127,6 +137,26 @@ jobs:
               } catch (e2) {
                 comment += 'Aucun rapport disponible.\n';
               }
+            }
+
+            // Ajouter le bon de livraison PDF si disponible (uniquement pour PR vers main)
+            const pdfPath = path.join(process.env.GITHUB_WORKSPACE, 'bon_livraison_tests.pdf');
+            if (fs.existsSync(pdfPath) && context.payload.pull_request.base.ref === 'main') {
+              // Uploader le PDF comme asset et créer un lien
+              const pdfBuffer = fs.readFileSync(pdfPath);
+              const pdfBase64 = pdfBuffer.toString('base64');
+              
+              // Créer un commentaire avec le PDF en pièce jointe via l'API
+              // Note: GitHub ne supporte pas directement les fichiers dans les commentaires,
+              // donc on upload le PDF comme artefact et on ajoute un lien dans le commentaire
+              const runId = context.runId;
+              const repo = context.repo;
+              const artifactUrl = `https://github.com/${repo.owner}/${repo.repo}/actions/runs/${runId}`;
+              
+              comment += '\n\n---\n\n';
+              comment += '## 📄 Bon de Livraison - Certificat de Tests\n\n';
+              comment += `📎 Le bon de livraison PDF est disponible dans les [artefacts de cette exécution](${artifactUrl}).\n\n`;
+              comment += 'Le PDF contient la liste complète des tests, leurs résultats et l\'horodatage de réalisation.';
             }
 
             const { data: comments } = await github.rest.issues.listComments({
