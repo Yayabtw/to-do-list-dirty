@@ -49,6 +49,39 @@ if [ $? -ne 0 ]; then
 fi
 echo "Accessibility tests passed!"
 
+################################################################################
+# Run Selenium (E2E) tests
+################################################################################
+echo ""
+echo "Running Selenium end-to-end tests..."
+
+SELENIUM_ERROR=0
+
+# List of selenium test scripts to run
+SELENIUM_TESTS=(
+  "tests/e2e/tc016_crud_10_tasks.py"
+  "tests/e2e/tc017_cross_impact.py"
+)
+
+for SELENIUM_TEST in "${SELENIUM_TESTS[@]}"; do
+  if [ ! -f "$SELENIUM_TEST" ]; then
+    echo "Warning: $SELENIUM_TEST not found, skipping."
+    continue
+  fi
+  echo "Executing: $SELENIUM_TEST"
+  pipenv run python "$SELENIUM_TEST"
+  if [ $? -ne 0 ]; then
+    echo "Error: Selenium test $SELENIUM_TEST failed. Please fix the errors before building."
+    SELENIUM_ERROR=1
+  fi
+done
+
+if [ $SELENIUM_ERROR -ne 0 ]; then
+  echo "At least one Selenium test failed. Aborting build."
+  exit 1
+fi
+echo "All Selenium end-to-end tests passed!"
+
 tmpfile=$(mktemp)
 awk -v ver="$VERSION" '/^VERSION = / {$0="VERSION = \x27"ver"\x27"} {print}' todo/settings.py > "$tmpfile" && mv "$tmpfile" todo/settings.py
 echo "Updated version in settings.py"
