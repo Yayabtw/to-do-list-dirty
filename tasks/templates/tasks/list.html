@@ -74,12 +74,17 @@
 		{% csrf_token %}
 		<label for="id_title" class="sr-only">Titre de la tâche</label>
 		{{form.title}}
+		<div style="margin: 8px 0;">
+			<label for="id_priority" style="color: #333;">
+				{{form.priority}} Prioritaire
+			</label>
+		</div>
 		<input class="btn btn-info" type="submit" value="Créer une tâche" aria-label="Créer une nouvelle tâche">
 	</form>
 
 	<div class="todo-list" role="list" aria-label="Liste des tâches">
 	{% for task in tasks %}
-		<div class="item-row" role="listitem">
+		<div class="item-row" role="listitem" data-task-id="{{ task.id }}" data-task-title="{{ task.title }}">
 			<a class="btn btn-sm btn-info" href = "{% url 'update_task' task.id %}" aria-label="Modifier la tâche {{ task.title }}">Modifier</a>
 			<a class="btn btn-sm btn-danger" href = "{% url 'delete' task.id %}" aria-label="Supprimer la tâche {{ task.title }}">Supprimer</a>
 			{% if task.complete == True %}

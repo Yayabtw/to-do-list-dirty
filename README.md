@@ -67,7 +67,7 @@ npm install
 pipenv run python manage.py migrate
 
 # Charger le dataset de test (optionnel)
-pipenv run python manage.py loaddata dataset.json
+pipenv run python manage.py loaddata tasks/fixtures/dataset.json
 
 # Lancer le serveur de développement
 pipenv run python manage.py runserver
@@ -108,7 +108,7 @@ L'application est conforme au standard **WCAG 2.1 niveau A**.
 ```bash
 # Lancer les tests d'accessibilité
 # (le serveur Django doit être en cours d'exécution)
-./test_accessibility.sh
+./scripts/test_accessibility.sh
 ```
 
 Pour plus de détails, voir [ACCESSIBILITY.md](ACCESSIBILITY.md).
@@ -117,7 +117,7 @@ Pour plus de détails, voir [ACCESSIBILITY.md](ACCESSIBILITY.md).
 
 ```bash
 # Créer une nouvelle version
-./build.sh version=X.Y.Z
+./scripts/build.sh version=X.Y.Z
 ```
 
 Le script de build :

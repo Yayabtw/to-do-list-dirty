@@ -1,9 +1,17 @@
 #!/bin/bash
 
 # Script to test the application with multiple Python and Django versions
-# Usage: ./test_multi_versions.sh
+# Usage: ./scripts/test_multi_versions.sh
 
 set -e
+
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get the project root directory (parent of scripts/)
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Change to project root
+cd "$PROJECT_ROOT"
 
 echo "=== Multi-Version Testing Script ==="
 echo ""
@@ -39,7 +47,7 @@ test_version() {
     # Install Django and dependencies
     pip install -q Django${django_version} coverage
     
-    # Run tests
+    # Run tests (from project root)
     if coverage run --source='.' manage.py test tasks.tests > /dev/null 2>&1; then
         echo -e "${GREEN}✓ Tests passed with Python ${python_version} and Django ${django_version}${NC}"
     else

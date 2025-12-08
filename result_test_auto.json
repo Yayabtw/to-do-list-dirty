@@ -1,0 +1,94 @@
+{
+  "timestamp": "2025-12-01T10:28:30.709198",
+  "duration": 0.037,
+  "total_tests": 9,
+  "summary": {
+    "passed": 9,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "tests": [
+    {
+      "test_number": "9",
+      "test_class": "DatasetImportTestCase",
+      "test_method": "test_dataset_import",
+      "test_name": "DatasetImportTestCase.test_dataset_import",
+      "status": "passed",
+      "error_message": null,
+      "description": "Test that the dataset is correctly imported."
+    },
+    {
+      "test_number": "7",
+      "test_class": "TaskModelTestCase",
+      "test_method": "test_task_creation",
+      "test_name": "TaskModelTestCase.test_task_creation",
+      "status": "passed",
+      "error_message": null,
+      "description": "Test creating a task."
+    },
+    {
+      "test_number": "8",
+      "test_class": "TaskModelTestCase",
+      "test_method": "test_task_str",
+      "test_name": "TaskModelTestCase.test_task_str",
+      "status": "passed",
+      "error_message": null,
+      "description": "Test the string representation of a task."
+    },
+    {
+      "test_number": "5",
+      "test_class": "TaskViewsTestCase",
+      "test_method": "test_delete_task_view_get",
+      "test_name": "TaskViewsTestCase.test_delete_task_view_get",
+      "status": "passed",
+      "error_message": null,
+      "description": "Test the delete task view GET request."
+    },
+    {
+      "test_number": "6",
+      "test_class": "TaskViewsTestCase",
+      "test_method": "test_delete_task_view_post",
+      "test_name": "TaskViewsTestCase.test_delete_task_view_post",
+      "status": "passed",
+      "error_message": null,
+      "description": "Test deleting a task via POST."
+    },
+    {
+      "test_number": "1",
+      "test_class": "TaskViewsTestCase",
+      "test_method": "test_index_view",
+      "test_name": "TaskViewsTestCase.test_index_view",
+      "status": "passed",
+      "error_message": null,
+      "description": "Test the index view (/)."
+    },
+    {
+      "test_number": "2",
+      "test_class": "TaskViewsTestCase",
+      "test_method": "test_index_view_post",
+      "test_name": "TaskViewsTestCase.test_index_view_post",
+      "status": "passed",
+      "error_message": null,
+      "description": "Test creating a task via POST to index view."
+    },
+    {
+      "test_number": "3",
+      "test_class": "TaskViewsTestCase",
+      "test_method": "test_update_task_view_get",
+      "test_name": "TaskViewsTestCase.test_update_task_view_get",
+      "status": "passed",
+      "error_message": null,
+      "description": "Test the update task view GET request."
+    },
+    {
+      "test_number": "4",
+      "test_class": "TaskViewsTestCase",
+      "test_method": "test_update_task_view_post",
+      "test_name": "TaskViewsTestCase.test_update_task_view_post",
+      "status": "passed",
+      "error_message": null,
+      "description": "Test updating a task via POST."
+    }
+  ]
+}

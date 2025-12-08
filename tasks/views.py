@@ -7,7 +7,7 @@ from .models import Task
 
 def index(request):
     """View for listing all tasks."""
-    tasks = Task.objects.all()
+    tasks = Task.objects.all().order_by('-priority', 'created')
     form = TaskForm()
 
     if request.method == 'POST':

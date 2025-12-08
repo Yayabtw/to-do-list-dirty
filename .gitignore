@@ -1,29 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Database
 *.db
 *.sqlite3
-__pycache__/
-*.pyc
+db.sqlite3
+
+# Environment variables
 .env
-.DS_Store
 .env.local
+.env.*.local
+
+# Logs
 *.log
 
-# Coverage
+# Coverage reports
 .coverage
+.coverage.*
 htmlcov/
 coverage.xml
-.coverage.*
 
-# Tox
+# Testing
 .tox/
+.pytest_cache/
 
-# Build artifacts
+# Build artifacts and releases
 *.zip
-todolist-*.zip
+releases/*.zip
+!releases/.gitkeep
 
 # IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Node modules
 node_modules/
 package-lock.json
-.idea/

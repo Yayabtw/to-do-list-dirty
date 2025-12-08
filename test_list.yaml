@@ -1,0 +1,256 @@
+tests:
+  - numero: 1
+    nom: "Test d'affichage de la liste des tâches"
+    type: "auto-unittest"
+    description: "Vérifier que la page d'accueil affiche correctement toutes les tâches"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_index_view"
+    ligne: 15
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_index_view"
+
+  - numero: 2
+    nom: "Test de création d'une tâche"
+    type: "auto-unittest"
+    description: "Vérifier la création d'une nouvelle tâche via POST"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_index_view_post"
+    ligne: 23
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_index_view_post"
+
+  - numero: 3
+    nom: "Test d'affichage du formulaire de modification"
+    type: "auto-unittest"
+    description: "Vérifier l'affichage de la page de modification d'une tâche"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_update_task_view_get"
+    ligne: 29
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_update_task_view_get"
+
+  - numero: 4
+    nom: "Test de modification d'une tâche"
+    type: "auto-unittest"
+    description: "Vérifier la modification d'une tâche existante"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_update_task_view_post"
+    ligne: 38
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_update_task_view_post"
+
+  - numero: 5
+    nom: "Test d'affichage de la confirmation de suppression"
+    type: "auto-unittest"
+    description: "Vérifier l'affichage de la page de confirmation de suppression"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_delete_task_view_get"
+    ligne: 49
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_delete_task_view_get"
+
+  - numero: 6
+    nom: "Test de suppression d'une tâche"
+    type: "auto-unittest"
+    description: "Vérifier la suppression effective d'une tâche"
+    fichier: "tasks/tests.py"
+    methode: "TaskViewsTestCase.test_delete_task_view_post"
+    ligne: 57
+    commande: "pipenv run python manage.py test tasks.tests.TaskViewsTestCase.test_delete_task_view_post"
+
+  - numero: 7
+    nom: "Test du modèle Task"
+    type: "auto-unittest"
+    description: "Vérifier la création d'un objet Task et ses valeurs par défaut"
+    fichier: "tasks/tests.py"
+    methode: "TaskModelTestCase.test_task_creation"
+    ligne: 70
+    commande: "pipenv run python manage.py test tasks.tests.TaskModelTestCase.test_task_creation"
+
+  - numero: 8
+    nom: "Test de la représentation string du modèle"
+    type: "auto-unittest"
+    description: "Vérifier que la méthode __str__ retourne le titre"
+    fichier: "tasks/tests.py"
+    methode: "TaskModelTestCase.test_task_str"
+    ligne: 77
+    commande: "pipenv run python manage.py test tasks.tests.TaskModelTestCase.test_task_str"
+
+  - numero: 9
+    nom: "Test d'import du dataset"
+    type: "auto-unittest"
+    description: "Vérifier que le fixture dataset.json se charge correctement"
+    fichier: "tasks/tests.py"
+    methode: "DatasetImportTestCase.test_dataset_import"
+    ligne: 88
+    commande: "pipenv run python manage.py test tasks.tests.DatasetImportTestCase.test_dataset_import"
+
+  - numero: 10
+    nom: "Test de conformité WCAG 2.1 niveau A"
+    type: "auto-unittest"
+    description: "Vérifier la conformité d'accessibilité de toutes les pages"
+    fichier: "scripts/test_accessibility.sh"
+    commande: "./scripts/test_accessibility.sh"
+    prerequis: "Serveur Django en cours d'exécution"
+
+  - numero: 11
+    nom: "Test de création d'une tâche vide"
+    type: "manuel"
+    description: "Vérifier le comportement lors d'une tentative de création d'une tâche sans titre"
+    categorie: "Test fonctionnel négatif"
+    procedure:
+      - "Accéder à http://localhost:8000/"
+      - "Cliquer sur 'Créer une tâche' sans remplir le champ"
+      - "Observer le comportement"
+    resultat_attendu: "Message d'erreur ou validation HTML5 empêchant la soumission"
+
+  - numero: 12
+    nom: "Test de modification d'une tâche inexistante"
+    type: "manuel"
+    description: "Vérifier le comportement lors de l'accès à une tâche inexistante"
+    categorie: "Test d'erreur"
+    procedure:
+      - "Accéder à http://localhost:8000/update_task/99999/"
+      - "Observer le comportement"
+    resultat_attendu: "Page d'erreur 404 ou message approprié"
+
+  - numero: 13
+    nom: "Test d'affichage des tâches complétées"
+    type: "manuel"
+    description: "Vérifier le style visuel des tâches marquées comme complétées"
+    categorie: "Contrôle visuel"
+    procedure:
+      - "Accéder à http://localhost:8000/"
+      - "Créer une nouvelle tâche"
+      - "La modifier pour la marquer comme complétée (cocher la case 'complete')"
+      - "Retourner à la liste"
+    resultat_attendu: "Tâche barrée (line-through) avec opacité réduite (0.8)"
+
+  - numero: 14
+    nom: "Test de responsive design"
+    type: "manuel"
+    description: "Vérifier l'affichage sur différentes tailles d'écran"
+    categorie: "Contrôle visuel multi-dispositifs"
+    procedure:
+      - "Accéder à http://localhost:8000/"
+      - "Tester sur résolution 375px (mobile)"
+      - "Tester sur résolution 768px (tablette)"
+      - "Tester sur résolution 1920px (desktop)"
+    resultat_attendu: "Contenu lisible sur toutes résolutions, pas de débordement"
+
+  - numero: 15
+    nom: "Test de la persistance des données"
+    type: "manuel"
+    description: "Vérifier que les données persistent après redémarrage du serveur"
+    categorie: "Test d'intégration"
+    procedure:
+      - "Créer 3 nouvelles tâches"
+      - "Arrêter le serveur Django (Ctrl+C)"
+      - "Redémarrer le serveur"
+      - "Accéder à http://localhost:8000/"
+    resultat_attendu: "Les 3 tâches créées sont toujours présentes"
+
+  - numero: 16
+    nom: "Test de cycle complet CRUD sur 10 tâches"
+    type: "auto-selenium"
+    description: "Vérifier le cycle complet de création et suppression de multiples tâches avec comptage (automatisé avec Selenium)"
+    categorie: "Test End-to-End"
+    fichier: "tests/e2e/tc016_crud_10_tasks.py"
+    commande: "pipenv run python tests/e2e/tc016_crud_10_tasks.py"
+    commande_alternative: "./run_e2e_test.sh"
+    prerequis: "Serveur Django en cours d'exécution sur http://127.0.0.1:8000 + ChromeDriver installé"
+    procedure_automatisee:
+      - "Navigation vers http://127.0.0.1:8000"
+      - "Comptage initial des tâches (N)"
+      - "Création de 10 tâches: 'Test Task E2E 1' à 'Test Task E2E 10'"
+      - "Vérification comptage = N + 10"
+      - "Suppression des 10 tâches créées"
+      - "Vérification comptage = N"
+    resultat_attendu: "Test PASSED avec comptage initial = N, après création = N+10, après suppression = N"
+    duree_execution: "30-60 secondes"
+
+  - numero: 17
+    nom: "Test de vérification des impacts croisés"
+    type: "auto-selenium"
+    description: "Vérifier qu'une suppression de tâche n'affecte pas les autres tâches (automatisé avec Selenium)"
+    categorie: "Test End-to-End - Impacts croisés"
+    fichier: "tests/e2e/tc017_cross_impact.py"
+    commande: "pipenv run python tests/e2e/tc017_cross_impact.py"
+    prerequis: "Serveur Django en cours d'exécution sur http://127.0.0.1:8000 + ChromeDriver installé"
+    procedure_automatisee:
+      - "Navigation vers http://127.0.0.1:8000"
+      - "Création d'une tâche (task1) et sauvegarde de son ID"
+      - "Création d'une autre tâche (task2)"
+      - "Vérification que les 2 tâches existent"
+      - "Suppression de task2"
+      - "Vérification que task2 n'existe plus"
+      - "Vérification CRITIQUE que task1 existe toujours"
+    resultat_attendu: "Test PASSED - task1 toujours présente après suppression de task2, pas d'impact croisé détecté"
+    duree_execution: "10-15 secondes"
+
+  - numero: 18
+    nom: "Test du champ priorité dans le modèle"
+    type: "auto-unittest"
+    description: "Vérifier que le modèle Task possède un champ priority"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_task_model_has_priority_field"
+    ligne: 122
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_task_model_has_priority_field"
+
+  - numero: 19
+    nom: "Test de la valeur par défaut du champ priorité"
+    type: "auto-unittest"
+    description: "Vérifier que la priorité est False par défaut"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_task_priority_default_is_false"
+    ligne: 128
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_task_priority_default_is_false"
+
+  - numero: 20
+    nom: "Test de création d'une tâche prioritaire"
+    type: "auto-unittest"
+    description: "Vérifier qu'on peut créer une tâche avec priority=True"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_task_creation_with_priority"
+    ligne: 134
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_task_creation_with_priority"
+
+  - numero: 21
+    nom: "Test de création d'une tâche prioritaire via POST"
+    type: "auto-unittest"
+    description: "Vérifier la création d'une tâche prioritaire via le formulaire"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_create_task_with_priority_via_post"
+    ligne: 141
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_create_task_with_priority_via_post"
+
+  - numero: 22
+    nom: "Test de modification de la priorité d'une tâche"
+    type: "auto-unittest"
+    description: "Vérifier qu'on peut modifier une tâche pour la rendre prioritaire"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_update_task_priority_via_post"
+    ligne: 152
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_update_task_priority_via_post"
+
+  - numero: 23
+    nom: "Test de l'ordre d'affichage (priorités en premier)"
+    type: "auto-unittest"
+    description: "Vérifier que les tâches prioritaires apparaissent en haut de la liste"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_priority_tasks_appear_first"
+    ligne: 164
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_priority_tasks_appear_first"
+
+  - numero: 24
+    nom: "Test de présence du champ priorité dans le formulaire de création"
+    type: "auto-unittest"
+    description: "Vérifier que le champ priorité apparaît dans le formulaire de création"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_priority_checkbox_in_create_form"
+    ligne: 186
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_priority_checkbox_in_create_form"
+
+  - numero: 25
+    nom: "Test de présence du champ priorité dans le formulaire de modification"
+    type: "auto-unittest"
+    description: "Vérifier que le champ priorité apparaît dans le formulaire de modification"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_priority_checkbox_in_update_form"
+    ligne: 193
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_priority_checkbox_in_update_form"

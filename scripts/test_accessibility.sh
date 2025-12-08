@@ -3,6 +3,14 @@
 # Script de test d'accessibilité WCAG 2.1 niveau A
 # Utilise pa11y-ci pour tester l'accessibilité de l'application
 
+# Get the directory where the script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get the project root directory (parent of scripts/)
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Change to project root
+cd "$PROJECT_ROOT"
+
 echo "=========================================="
 echo "Test d'accessibilité WCAG 2.1 niveau A"
 echo "=========================================="
