@@ -74,6 +74,11 @@
 		{% csrf_token %}
 		<label for="id_title" class="sr-only">Titre de la tâche</label>
 		{{form.title}}
+		<div style="margin: 8px 0;">
+			<label for="id_priority" style="color: #333;">
+				{{form.priority}} Prioritaire
+			</label>
+		</div>
 		<input class="btn btn-info" type="submit" value="Créer une tâche" aria-label="Créer une nouvelle tâche">
 	</form>
 

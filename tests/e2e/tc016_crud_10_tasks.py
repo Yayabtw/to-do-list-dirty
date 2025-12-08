@@ -15,11 +15,12 @@ import json
 import sys
 import time
 from datetime import datetime
+
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 # Configuration
 BASE_URL = "http://127.0.0.1:8000"
@@ -79,12 +80,12 @@ class TC016TestRunner:
         try:
             self.driver.get(self.base_url)
             WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_element_located((By.TAG_NAME, "h1"))
+                expected_conditions.presence_of_element_located((By.TAG_NAME, "h1"))
             )
             print("✅ Application chargée")
             return True
         except TimeoutException:
-            print(f"❌ Timeout: L'application n'a pas chargé à temps")
+            print("❌ Timeout: L'application n'a pas chargé à temps")
             print(f"💡 Assurez-vous que le serveur Django tourne sur {self.base_url}")
             return False
 
@@ -159,7 +160,7 @@ class TC016TestRunner:
 
                     # Confirmer la suppression
                     confirm_button = WebDriverWait(self.driver, TIMEOUT).until(
-                        EC.element_to_be_clickable((By.CSS_SELECTOR, "input[type='submit']"))
+                        expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "input[type='submit']"))
                     )
                     confirm_button.click()
 
@@ -202,7 +203,7 @@ class TC016TestRunner:
             result['details']['initial_count'] = self.initial_task_count
 
             # Étape 3: Créer 10 tâches
-            print(f"\n➕ Étape 2: Création de 10 tâches")
+            print("\n➕ Étape 2: Création de 10 tâches")
             created_count = 0
             for i in range(1, 11):
                 task_title = f"{TASK_PREFIX} {i}"
@@ -221,7 +222,7 @@ class TC016TestRunner:
                 result['errors'].append(f"Seulement {created_count}/10 tâches créées")
 
             # Étape 4: Vérifier le comptage après création
-            print(f"\n📊 Étape 3: Comptage après création")
+            print("\n📊 Étape 3: Comptage après création")
             count_after_creation = self.count_tasks()
             result['details']['count_after_creation'] = count_after_creation
             expected_count = self.initial_task_count + 10
@@ -236,7 +237,7 @@ class TC016TestRunner:
                 )
 
             # Étape 5: Supprimer les 10 tâches
-            print(f"\n🗑️  Étape 4: Suppression de 10 tâches")
+            print("\n🗑️  Étape 4: Suppression de 10 tâches")
             deleted_count = 0
             for i in range(1, 11):
                 task_title = f"{TASK_PREFIX} {i}"
@@ -255,7 +256,7 @@ class TC016TestRunner:
                 result['errors'].append(f"Seulement {deleted_count}/10 tâches supprimées")
 
             # Étape 6: Vérifier le retour au comptage initial
-            print(f"\n📊 Étape 5: Comptage final")
+            print("\n📊 Étape 5: Comptage final")
             final_count = self.count_tasks()
             result['details']['final_count'] = final_count
 
@@ -335,7 +336,7 @@ def main():
         print("=" * 70)
         print(f"Test: {result['test_name']}")
         print(f"Statut: {result['status'].upper()}")
-        print(f"\nDétails:")
+        print("\nDétails:")
         for key, value in result['details'].items():
             print(f"  - {key}: {value}")
 
@@ -344,7 +345,7 @@ def main():
             for error in result['errors']:
                 print(f"  - {error}")
         else:
-            print(f"\n✅ Aucune erreur")
+            print("\n✅ Aucune erreur")
 
         print("=" * 70)
 

@@ -182,3 +182,75 @@ tests:
       - "Vérification CRITIQUE que task1 existe toujours"
     resultat_attendu: "Test PASSED - task1 toujours présente après suppression de task2, pas d'impact croisé détecté"
     duree_execution: "10-15 secondes"
+
+  - numero: 18
+    nom: "Test du champ priorité dans le modèle"
+    type: "auto-unittest"
+    description: "Vérifier que le modèle Task possède un champ priority"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_task_model_has_priority_field"
+    ligne: 122
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_task_model_has_priority_field"
+
+  - numero: 19
+    nom: "Test de la valeur par défaut du champ priorité"
+    type: "auto-unittest"
+    description: "Vérifier que la priorité est False par défaut"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_task_priority_default_is_false"
+    ligne: 128
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_task_priority_default_is_false"
+
+  - numero: 20
+    nom: "Test de création d'une tâche prioritaire"
+    type: "auto-unittest"
+    description: "Vérifier qu'on peut créer une tâche avec priority=True"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_task_creation_with_priority"
+    ligne: 134
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_task_creation_with_priority"
+
+  - numero: 21
+    nom: "Test de création d'une tâche prioritaire via POST"
+    type: "auto-unittest"
+    description: "Vérifier la création d'une tâche prioritaire via le formulaire"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_create_task_with_priority_via_post"
+    ligne: 141
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_create_task_with_priority_via_post"
+
+  - numero: 22
+    nom: "Test de modification de la priorité d'une tâche"
+    type: "auto-unittest"
+    description: "Vérifier qu'on peut modifier une tâche pour la rendre prioritaire"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_update_task_priority_via_post"
+    ligne: 152
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_update_task_priority_via_post"
+
+  - numero: 23
+    nom: "Test de l'ordre d'affichage (priorités en premier)"
+    type: "auto-unittest"
+    description: "Vérifier que les tâches prioritaires apparaissent en haut de la liste"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_priority_tasks_appear_first"
+    ligne: 164
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_priority_tasks_appear_first"
+
+  - numero: 24
+    nom: "Test de présence du champ priorité dans le formulaire de création"
+    type: "auto-unittest"
+    description: "Vérifier que le champ priorité apparaît dans le formulaire de création"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_priority_checkbox_in_create_form"
+    ligne: 186
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_priority_checkbox_in_create_form"
+
+  - numero: 25
+    nom: "Test de présence du champ priorité dans le formulaire de modification"
+    type: "auto-unittest"
+    description: "Vérifier que le champ priorité apparaît dans le formulaire de modification"
+    fichier: "tasks/tests.py"
+    methode: "TaskPriorityTestCase.test_priority_checkbox_in_update_form"
+    ligne: 193
+    commande: "pipenv run python manage.py test tasks.tests.TaskPriorityTestCase.test_priority_checkbox_in_update_form"

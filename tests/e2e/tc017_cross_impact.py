@@ -13,11 +13,12 @@ import json
 import sys
 import time
 from datetime import datetime
+
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 # Configuration
 BASE_URL = "http://127.0.0.1:8000"
@@ -77,12 +78,12 @@ class TC017TestRunner:
         try:
             self.driver.get(self.base_url)
             WebDriverWait(self.driver, TIMEOUT).until(
-                EC.presence_of_element_located((By.TAG_NAME, "h1"))
+                expected_conditions.presence_of_element_located((By.TAG_NAME, "h1"))
             )
             print("✅ Application chargée")
             return True
         except TimeoutException:
-            print(f"❌ Timeout: L'application n'a pas chargé à temps")
+            print("❌ Timeout: L'application n'a pas chargé à temps")
             return False
 
     def create_task(self, task_title):
@@ -96,10 +97,6 @@ class TC017TestRunner:
             str: ID de la tâche créée, ou None si échec
         """
         try:
-            # Sauvegarder le nombre de tâches avant création
-            tasks_before = self.driver.find_elements(By.CLASS_NAME, "item-row")
-            count_before = len(tasks_before)
-
             # Trouver le champ de saisie
             input_field = self.driver.find_element(By.ID, "id_title")
             input_field.clear()
@@ -123,7 +120,7 @@ class TC017TestRunner:
                     print(f"✅ Tâche '{task_title}' créée avec ID={task_id}")
                     return task_id
 
-            print(f"⚠️  Tâche créée mais ID non trouvé")
+            print("⚠️  Tâche créée mais ID non trouvé")
             return None
 
         except Exception as e:
@@ -189,7 +186,7 @@ class TC017TestRunner:
 
             # Confirmer la suppression
             confirm_button = WebDriverWait(self.driver, TIMEOUT).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "input[type='submit']"))
+                expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, "input[type='submit']"))
             )
             confirm_button.click()
 
@@ -243,7 +240,7 @@ class TC017TestRunner:
                 return result
 
             # Étape 2: Créer la première tâche
-            print(f"\n➕ Étape 1: Création de la tâche 1")
+            print("\n➕ Étape 1: Création de la tâche 1")
             self.task1_id = self.create_task(self.task1_title)
 
             if not self.task1_id:
@@ -255,7 +252,7 @@ class TC017TestRunner:
             result['details']['task1_title'] = self.task1_title
 
             # Étape 3: Créer la deuxième tâche
-            print(f"\n➕ Étape 2: Création de la tâche 2")
+            print("\n➕ Étape 2: Création de la tâche 2")
             task2_id = self.create_task(self.task2_title)
 
             if not task2_id:
@@ -267,37 +264,37 @@ class TC017TestRunner:
             result['details']['task2_title'] = self.task2_title
 
             # Étape 4: Vérifier que les deux tâches existent
-            print(f"\n🔍 Étape 3: Vérification existence des 2 tâches")
+            print("\n🔍 Étape 3: Vérification existence des 2 tâches")
             if not self.verify_task_exists(self.task1_id, self.task1_title):
                 result['status'] = 'failed'
                 result['errors'].append("Task1 non trouvée après création des 2 tâches")
                 return result
-            print(f"✅ Task1 présente")
+            print("✅ Task1 présente")
 
             if not self.verify_task_exists(task2_id, self.task2_title):
                 result['status'] = 'failed'
                 result['errors'].append("Task2 non trouvée après création")
                 return result
-            print(f"✅ Task2 présente")
+            print("✅ Task2 présente")
 
             # Étape 5: Supprimer la deuxième tâche
-            print(f"\n🗑️  Étape 4: Suppression de la tâche 2")
+            print("\n🗑️  Étape 4: Suppression de la tâche 2")
             if not self.delete_task_by_id(task2_id):
                 result['status'] = 'failed'
                 result['errors'].append("Échec suppression task2")
                 return result
-            print(f"✅ Task2 supprimée")
+            print("✅ Task2 supprimée")
 
             # Étape 6: Vérifier que task2 n'existe plus
-            print(f"\n🔍 Étape 5: Vérification que task2 est supprimée")
+            print("\n🔍 Étape 5: Vérification que task2 est supprimée")
             if self.verify_task_exists(task2_id, self.task2_title):
                 result['status'] = 'failed'
                 result['errors'].append("Task2 toujours présente après suppression")
                 return result
-            print(f"✅ Task2 bien supprimée")
+            print("✅ Task2 bien supprimée")
 
             # Étape 7: CRITIQUE - Vérifier que task1 existe toujours
-            print(f"\n🔍 Étape 6: Vérification CRITIQUE - task1 toujours présente")
+            print("\n🔍 Étape 6: Vérification CRITIQUE - task1 toujours présente")
             if not self.verify_task_exists(self.task1_id, self.task1_title):
                 result['status'] = 'failed'
                 result['errors'].append(
@@ -305,8 +302,8 @@ class TC017TestRunner:
                 )
                 return result
 
-            print(f"✅ Task1 toujours présente et intacte")
-            print(f"✅ PAS D'IMPACT CROISÉ - Le test est réussi!")
+            print("✅ Task1 toujours présente et intacte")
+            print("✅ PAS D'IMPACT CROISÉ - Le test est réussi!")
 
             result['details']['cross_impact_detected'] = False
 
@@ -331,10 +328,10 @@ def export_results_to_json(result, filename='result_test_selenium.json'):
     existing_tests = []
     if os.path.exists(filename):
         try:
-            with open(filename, 'r', encoding='utf-8') as f:
+            with open(filename, encoding='utf-8') as f:
                 existing_data = json.load(f)
                 existing_tests = existing_data.get('tests', [])
-        except:
+        except Exception:
             pass
 
     # Ajouter le nouveau test
@@ -405,7 +402,7 @@ def main():
         print("=" * 70)
         print(f"Test: {result['test_name']}")
         print(f"Statut: {result['status'].upper()}")
-        print(f"\nDétails:")
+        print("\nDétails:")
         for key, value in result['details'].items():
             print(f"  - {key}: {value}")
 
@@ -414,7 +411,7 @@ def main():
             for error in result['errors']:
                 print(f"  - {error}")
         else:
-            print(f"\n✅ Aucune erreur")
+            print("\n✅ Aucune erreur")
 
         print("=" * 70)
 

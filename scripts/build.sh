@@ -66,6 +66,7 @@ git tag -a v$VERSION -m "Release version $VERSION"
 
 echo "Created tag v$VERSION"
 echo "Pushing tag to remote..."
+git push origin HEAD
 git push origin v$VERSION
 
 # Create releases directory if it doesn't exist

@@ -113,3 +113,86 @@ class DatasetImportTestCase(TestCase):
         task5 = Task.objects.get(pk=5)
         self.assertEqual(task5.title, "Update documentation")
         self.assertTrue(task5.complete)
+
+
+class TaskPriorityTestCase(TestCase):
+    """Test case for task priority feature."""
+
+    @tc("18")
+    def test_task_model_has_priority_field(self):
+        """Test that Task model has a priority field."""
+        task = Task.objects.create(title="Priority Test Task")
+        self.assertTrue(hasattr(task, 'priority'))
+
+    @tc("19")
+    def test_task_priority_default_is_false(self):
+        """Test that priority defaults to False."""
+        task = Task.objects.create(title="Normal Task")
+        self.assertFalse(task.priority)
+
+    @tc("20")
+    def test_task_creation_with_priority(self):
+        """Test creating a task with priority=True."""
+        task = Task.objects.create(title="Important Task", priority=True)
+        self.assertTrue(task.priority)
+        self.assertEqual(task.title, "Important Task")
+
+    @tc("21")
+    def test_create_task_with_priority_via_post(self):
+        """Test creating a priority task via POST."""
+        response = self.client.post(reverse('list'), {
+            'title': 'Priority Task',
+            'priority': True
+        })
+        self.assertEqual(response.status_code, 302)  # Redirect
+        task = Task.objects.get(title='Priority Task')
+        self.assertTrue(task.priority)
+
+    @tc("22")
+    def test_update_task_priority_via_post(self):
+        """Test updating a task to set priority=True."""
+        task = Task.objects.create(title="Normal Task", priority=False)
+        response = self.client.post(
+            reverse('update_task', kwargs={'pk': task.id}),
+            {'title': 'Normal Task', 'complete': False, 'priority': True}
+        )
+        self.assertEqual(response.status_code, 302)
+        task.refresh_from_db()
+        self.assertTrue(task.priority)
+
+    @tc("23")
+    def test_priority_tasks_appear_first(self):
+        """Test that priority tasks appear before normal tasks in list."""
+        # Create tasks in specific order
+        Task.objects.create(title="Normal Task 1", priority=False)
+        Task.objects.create(title="Priority Task 1", priority=True)
+        Task.objects.create(title="Normal Task 2", priority=False)
+        Task.objects.create(title="Priority Task 2", priority=True)
+
+        # Get the list view
+        response = self.client.get(reverse('list'))
+        tasks = response.context['tasks']
+
+        # Convert to list to access by index
+        tasks_list = list(tasks)
+
+        # Priority tasks should be first
+        self.assertTrue(tasks_list[0].priority)
+        self.assertTrue(tasks_list[1].priority)
+        self.assertFalse(tasks_list[2].priority)
+        self.assertFalse(tasks_list[3].priority)
+
+    @tc("24")
+    def test_priority_checkbox_in_create_form(self):
+        """Test that priority checkbox appears in create form."""
+        response = self.client.get(reverse('list'))
+        # The form should contain a priority field
+        self.assertContains(response, 'name="priority"')
+
+    @tc("25")
+    def test_priority_checkbox_in_update_form(self):
+        """Test that priority checkbox appears in update form."""
+        task = Task.objects.create(title="Test Task", priority=False)
+        response = self.client.get(reverse('update_task', kwargs={'pk': task.id}))
+        # The form should contain a priority field
+        self.assertContains(response, 'name="priority"')

@@ -64,3 +64,4 @@ Script pour tester l'application avec plusieurs versions de Python et Django.
 
 **Note :** Les versions de Python doivent être installées sur le système pour être testées.
 
+
