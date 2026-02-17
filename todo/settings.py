@@ -125,4 +125,9 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-VERSION = '1.5.2'
+VERSION = '2.0.0'
+
+# TMDB API Configuration
+# Get your API token at https://www.themoviedb.org/settings/api
+# Use the "API Read Access Token" (Bearer token)
+TMDB_API_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4MmM3N2JiNTVlZjI5NmIyYWQ4NmI1NzhkN2NlMTc1OSIsIm5iZiI6MTc3MTMxNzUwNC43MjgsInN1YiI6IjY5OTQyOTAwMTExNTM1YmRkOWZhM2M5ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.9_DvZrGSon127reVShvDBhAA-oy4xZjUIzd46m2R-m4'
