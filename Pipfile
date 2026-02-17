@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 django = "*"
+requests = "*"
 pyyaml = "*"
 selenium = "*"
 reportlab = "*"
@@ -16,4 +17,4 @@ tox = "*"
 reportlab = "*"
 
 [requires]
-python_version = "3.13"
+python_version = "3"
