@@ -125,6 +125,11 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Authentication
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'list'
+LOGOUT_REDIRECT_URL = 'login'
+
 VERSION = '2.0.0'
 
 # TMDB API Configuration

@@ -31,6 +31,10 @@
 </head>
 <body>
 	<div class="center-column">
+		<p style="text-align: right; margin-bottom: 0; font-size: 14px;">
+			{{ user.username }} | <form method="post" action="{% url 'logout' %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-link p-0" style="vertical-align: baseline; font-size: 14px;">Déconnexion</button></form>
+		</p>
+		<hr>
 		<p>Voulez-vous vraiment supprimer "<strong>{{ item }}</strong>" de votre watchlist ?</p>
 		<a href="{% url 'list' %}" class="btn btn-info">Annuler</a>
 		<form method="POST" action="" style="display:inline;">
