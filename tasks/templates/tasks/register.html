@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -20,12 +21,38 @@
 		.btn-info:hover { background-color: #004085; color: #fff; }
 		.helptext { font-size: 12px; color: #666; }
 		.errorlist { color: #dc3545; font-size: 13px; }
+		.fc-sep { margin: 1.5rem 0; text-align: center; color: #666; font-size: 14px; }
+		.btn-franceconnect {
+			display: inline-block; width: 209px; height: 56px; position: relative; text-decoration: none;
+		}
+		.btn-franceconnect img {
+			position: absolute; left: 0; top: 0; width: 209px; height: 56px; display: block; transition: opacity 0.15s ease;
+		}
+		.btn-franceconnect .fc-btn-hover { opacity: 0; }
+		.btn-franceconnect:hover .fc-btn-default { opacity: 0; }
+		.btn-franceconnect:hover .fc-btn-hover { opacity: 1; }
+		.fc-block { text-align: center; margin-top: 1rem; }
+		.fc-block .fc-explanation { font-size: 12px; color: #666; margin-bottom: 12px; }
+		.fc-block .fc-link { margin-top: 12px; }
+		.fc-block .fc-link a { color: #000091; }
 	</style>
 </head>
 <body>
 	<h1 style="text-align: center; color: #fb5607; font-size: 125px; text-shadow: -10px 0 black, 0 10px black, 10px 0 black, 0 -10px black;">MY WATCH LIST</h1>
 	<div class="center-column">
 		<h2>Créer un compte</h2>
+
+		<p class="fc-block">
+			<span class="fc-explanation">FranceConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion à vos services en ligne.</span>
+			<a href="{% url 'france_connect_authorize' %}" class="btn-franceconnect" title="S'identifier avec France Connect">
+				<img class="fc-btn-default" src="{% static 'tasks/img/franceconnect-btn-principal.svg' %}" alt="S'identifier avec FranceConnect" width="209" height="56">
+				<img class="fc-btn-hover" src="{% static 'tasks/img/franceconnect-btn-principal-hover.svg' %}" alt="" width="209" height="56" aria-hidden="true">
+			</a>
+			<p class="fc-link"><a href="https://franceconnect.gouv.fr/" target="_blank" rel="noopener" title="Qu'est-ce que FranceConnect ?">Qu'est-ce que FranceConnect ?</a></p>
+		</p>
+
+		<div class="fc-sep">— OU —</div>
+
 		<form method="post" action="{% url 'register' %}">
 			{% csrf_token %}
 			{{ form.as_p }}

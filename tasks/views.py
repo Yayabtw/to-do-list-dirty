@@ -1,12 +1,16 @@
+import secrets
+from urllib.parse import urlencode
+
 import requests
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import login
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import Series
+from .models import FranceConnectProfile, Series
 
 TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 
@@ -23,15 +27,15 @@ PROVIDER_LABELS = {
 }
 
 
-def _fetch_series_from_tmdb(provider_key, user, count=10):
+def _fetch_series_from_tmdb(provider_key, count=10):
     """Fetch top-rated series from TMDB for a given provider.
 
-    Returns up to `count` series that are NOT already in the user's watchlist,
+    Returns up to `count` series that are NOT already in the database,
     by paginating through TMDB results as needed.
     """
     provider_id = PROVIDER_IDS[provider_key]
     existing_tmdb_ids = set(
-        Series.objects.filter(user=user, tmdb_id__isnull=False)
+        Series.objects.filter(tmdb_id__isnull=False)
         .values_list('tmdb_id', flat=True)
     )
 
@@ -126,59 +130,24 @@ def delete_series(request, pk):
 
     if request.method == "POST":
         item.delete()
-        return redirect('/')
+        return redirect('list')
 
     context = {'item': item}
     return render(request, 'tasks/delete.html', context)
-
-
-def login_view(request):
-    """Custom login view so the form receives request and username is stripped."""
-    if request.user.is_authenticated:
-        return redirect('list')
-    if request.method == 'POST':
-        # Strip username to avoid "wrong credentials" due to spaces
-        post = request.POST.copy()
-        if 'username' in post:
-            post['username'] = post['username'].strip()
-        form = AuthenticationForm(request, data=post)
-        if form.is_valid():
-            login(request, form.get_user())
-            next_url = request.POST.get('next') or request.GET.get('next') or settings.LOGIN_REDIRECT_URL
-            return redirect(next_url)
-    else:
-        form = AuthenticationForm(request)
-    return render(request, 'tasks/login.html', {'form': form, 'next': request.GET.get('next', '')})
-
-
-def register(request):
-    """View for user registration."""
-    if request.user.is_authenticated:
-        return redirect('list')
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, 'Compte créé. Bienvenue !')
-            return redirect('list')
-    else:
-        form = UserCreationForm()
-    return render(request, 'tasks/register.html', {'form': form})
 
 
 @login_required
 def import_series(request, provider):
     """Import 10 series from a streaming provider via TMDB API."""
     if request.method != 'POST':
-        return redirect('/')
+        return redirect('list')
 
     if provider not in PROVIDER_IDS:
         messages.error(request, f'Fournisseur inconnu : {provider}')
-        return redirect('/')
+        return redirect('list')
 
     try:
-        new_series = _fetch_series_from_tmdb(provider, request.user, count=10)
+        new_series = _fetch_series_from_tmdb(provider, count=10)
 
         created_count = 0
         for s in new_series:
@@ -204,4 +173,156 @@ def import_series(request, provider):
             f'Erreur lors de la récupération des séries : {e}'
         )
 
-    return redirect('/')
+    return redirect('list')
+
+
+# --- Authentification (interne + France Connect) ---
+
+
+def login_view(request):
+    """Page de connexion : formulaire classique + bouton France Connect."""
+    if request.user.is_authenticated:
+        return redirect(settings.LOGIN_REDIRECT_URL)
+
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            auth_login(request, form.get_user())
+            next_url = request.POST.get('next') or request.GET.get('next') or settings.LOGIN_REDIRECT_URL
+            return redirect(next_url)
+    else:
+        form = AuthenticationForm(request)
+
+    return render(request, 'tasks/login.html', {'form': form})
+
+
+def logout_view(request):
+    """Déconnexion."""
+    auth_logout(request)
+    return redirect(settings.LOGOUT_REDIRECT_URL)
+
+
+def register_view(request):
+    """Création de compte (authentification interne)."""
+    if request.user.is_authenticated:
+        return redirect(settings.LOGIN_REDIRECT_URL)
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Compte créé. Vous pouvez vous connecter.")
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'tasks/register.html', {'form': form})
+
+
+def france_connect_authorize(request):
+    """Redirige vers l'endpoint d'autorisation France Connect (API v1)."""
+    state = secrets.token_urlsafe(32)
+    nonce = secrets.token_urlsafe(32)
+    request.session['france_connect_state'] = state
+    request.session['france_connect_nonce'] = nonce
+
+    params = {
+        'response_type': 'code',
+        'client_id': settings.FRANCE_CONNECT_CLIENT_ID,
+        'redirect_uri': settings.FRANCE_CONNECT_REDIRECT_URI,
+        'scope': 'openid profile email',
+        'state': state,
+        'nonce': nonce,
+    }
+    url = f"{settings.FRANCE_CONNECT_BASE_URL}/api/v1/authorize?{urlencode(params)}"
+    return redirect(url)
+
+
+def france_connect_callback(request):
+    """
+    Callback France Connect : échange du code contre un token, récupération userinfo,
+    puis création du compte si inconnu et connexion.
+    """
+    state_sent = request.session.pop('france_connect_state', None)
+    code = request.GET.get('code')
+    state_received = request.GET.get('state')
+    error = request.GET.get('error')
+
+    if error:
+        messages.error(
+            request,
+            f"France Connect a renvoyé une erreur : {error}. "
+            "Vérifiez la configuration (redirect_uri, client_id)."
+        )
+        return redirect('login')
+
+    if not code or state_sent is None or state_received != state_sent:
+        messages.error(request, "Paramètres de retour France Connect invalides.")
+        return redirect('login')
+
+    # Échange code -> token
+    token_url = f"{settings.FRANCE_CONNECT_BASE_URL}/api/v1/token"
+    token_data = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': settings.FRANCE_CONNECT_REDIRECT_URI,
+        'client_id': settings.FRANCE_CONNECT_CLIENT_ID,
+        'client_secret': settings.FRANCE_CONNECT_CLIENT_SECRET,
+    }
+    try:
+        token_resp = requests.post(token_url, data=token_data, timeout=10)
+        token_resp.raise_for_status()
+        token_json = token_resp.json()
+    except requests.RequestException as e:
+        messages.error(request, f"Erreur lors de l'échange du code France Connect : {e}")
+        return redirect('login')
+
+    access_token = token_json.get('access_token')
+    if not access_token:
+        messages.error(request, "France Connect n'a pas renvoyé de jeton d'accès.")
+        return redirect('login')
+
+    # Récupération des infos utilisateur (userinfo)
+    userinfo_url = f"{settings.FRANCE_CONNECT_BASE_URL}/api/v1/userinfo?schema=openid"
+    headers = {'Authorization': f'Bearer {access_token}'}
+    try:
+        userinfo_resp = requests.get(userinfo_url, headers=headers, timeout=10)
+        userinfo_resp.raise_for_status()
+        userinfo = userinfo_resp.json()
+    except requests.RequestException as e:
+        messages.error(request, "Impossible de récupérer les informations France Connect.")
+        return redirect('login')
+
+    sub = userinfo.get('sub')
+    if not sub:
+        messages.error(request, "Identifiant France Connect (sub) manquant.")
+        return redirect('login')
+
+    # Liaison ou création du compte
+    try:
+        profile = FranceConnectProfile.objects.get(sub=sub)
+        user = profile.user
+    except FranceConnectProfile.DoesNotExist:
+        # Création automatique du compte utilisateur
+        given_name = userinfo.get('given_name') or ''
+        family_name = userinfo.get('family_name') or ''
+        email = userinfo.get('email') or ''
+        base_username = f"fc_{sub}"[:150]
+        username = base_username
+        idx = 0
+        while User.objects.filter(username=username).exists():
+            idx += 1
+            username = f"{base_username}_{idx}"[:150]
+
+        user = User.objects.create_user(
+            username=username,
+            email=email or f"{username}@franceconnect.local",
+            first_name=given_name,
+            last_name=family_name,
+            password=None,
+        )
+        user.set_unusable_password()
+        user.save()
+        FranceConnectProfile.objects.create(user=user, sub=sub)
+
+    auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    messages.success(request, "Connexion réussie avec France Connect.")
+    return redirect(settings.LOGIN_REDIRECT_URL)

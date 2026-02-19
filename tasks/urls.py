@@ -1,12 +1,8 @@
-from django.contrib.auth.views import LogoutView
 from django.urls import path
 
 from . import views
 
 urlpatterns = [
-    path('login/', views.login_view, name='login'),
-    path('logout/', LogoutView.as_view(), name='logout'),
-    path('register/', views.register, name='register'),
     path('', views.index, name="list"),
     path('series/<str:pk>/', views.detail_series, name="detail"),
     path('series/<str:pk>/toggle/', views.toggle_watched, name="toggle_watched"),
@@ -16,4 +12,10 @@ urlpatterns = [
         views.import_series,
         name="import_series",
     ),
+    # Authentification
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('register/', views.register_view, name='register'),
+    path('france-connect/', views.france_connect_authorize, name='france_connect_authorize'),
+    path('callback', views.france_connect_callback, name='france_connect_callback'),
 ]

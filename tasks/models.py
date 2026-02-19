@@ -1,6 +1,23 @@
-from django.db import models
 from django.conf import settings
-from django.db.models import Q
+from django.db import models
+
+
+class FranceConnectProfile(models.Model):
+    """Liaison entre un utilisateur Django et un identifiant France Connect (sub)."""
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='france_connect_profile',
+    )
+    sub = models.CharField(max_length=255, unique=True, db_index=True)
+
+    class Meta:
+        verbose_name = 'Profil France Connect'
+        verbose_name_plural = 'Profils France Connect'
+
+    def __str__(self):
+        return f"FC {self.sub} → {self.user.username}"
 
 
 class Series(models.Model):
@@ -21,7 +38,7 @@ class Series(models.Model):
         blank=True,
     )
     title = models.CharField(max_length=200)
-    tmdb_id = models.IntegerField(null=True, blank=True)
+    tmdb_id = models.IntegerField(unique=True, null=True, blank=True)
     overview = models.TextField(blank=True, default='')
     vote_average = models.FloatField(default=0.0)
     poster_path = models.CharField(max_length=500, blank=True, default='')
@@ -35,13 +52,6 @@ class Series(models.Model):
         verbose_name = 'Série'
         verbose_name_plural = 'Séries'
         ordering = ['-created']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'tmdb_id'],
-                condition=Q(tmdb_id__isnull=False),
-                name='unique_user_tmdb',
-            ),
-        ]
 
     def __str__(self):
         return self.title

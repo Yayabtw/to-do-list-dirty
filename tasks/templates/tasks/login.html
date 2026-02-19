@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -18,30 +19,65 @@
 		input { width: 100%; padding: 12px 20px; margin: 8px 0; box-sizing: border-box; }
 		.btn-info { background-color: #0056b3; border-color: #004085; color: #fff; }
 		.btn-info:hover { background-color: #004085; color: #fff; }
+		.errorlist { color: #dc3545; font-size: 13px; }
+		.fc-sep {
+			margin: 1.5rem 0;
+			text-align: center;
+			color: #666;
+			font-size: 14px;
+		}
+		/* Bouton officiel France Connect (assets FranceConnect-Bouton V04_07_2023) — 209×56px */
+		.btn-franceconnect {
+			display: inline-block;
+			width: 209px;
+			height: 56px;
+			position: relative;
+			text-decoration: none;
+		}
+		.btn-franceconnect img {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 209px;
+			height: 56px;
+			display: block;
+			transition: opacity 0.15s ease;
+		}
+		.btn-franceconnect .fc-btn-hover { opacity: 0; }
+		.btn-franceconnect:hover .fc-btn-default { opacity: 0; }
+		.btn-franceconnect:hover .fc-btn-hover { opacity: 1; }
+		.fc-block { text-align: center; margin-top: 1rem; }
+		.fc-block p { font-size: 12px; color: #666; margin-top: 12px; }
+		.fc-block a { color: #000091; }
 	</style>
 </head>
 <body>
 	<h1 style="text-align: center; color: #fb5607; font-size: 125px; text-shadow: -10px 0 black, 0 10px black, 10px 0 black, 0 -10px black;">MY WATCH LIST</h1>
 	<div class="center-column">
-		<h2>Connexion</h2>
-		{% if form.errors %}
-		<p class="text-danger">Identifiant ou mot de passe incorrect.</p>
-		{% endif %}
+		<h2>Se connecter</h2>
+
+		<p class="fc-block">
+			<a href="{% url 'france_connect_authorize' %}" class="btn-franceconnect" title="S'identifier avec France Connect">
+				<img class="fc-btn-default" src="{% static 'tasks/img/franceconnect-btn-principal.svg' %}" alt="S'identifier avec FranceConnect" width="209" height="56">
+				<img class="fc-btn-hover" src="{% static 'tasks/img/franceconnect-btn-principal-hover.svg' %}" alt="" width="209" height="56" aria-hidden="true">
+			</a>
+		</p>
+		<p class="fc-block p small">
+			FranceConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion à vos services en ligne.
+		</p>
+		<p class="fc-block">
+			<a href="https://franceconnect.gouv.fr/" target="_blank" rel="noopener" title="Qu'est-ce que FranceConnect ?">Qu'est-ce que FranceConnect ?</a>
+		</p>
+
+		<div class="fc-sep">— ou avec votre compte —</div>
+
 		<form method="post" action="{% url 'login' %}">
 			{% csrf_token %}
-			<table>
-				<tr>
-					<td>{{ form.username.label_tag }}</td>
-					<td>{{ form.username }}</td>
-				</tr>
-				<tr>
-					<td>{{ form.password.label_tag }}</td>
-					<td>{{ form.password }}</td>
-				</tr>
-			</table>
-			<input type="hidden" name="next" value="{{ next }}">
+			{% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+			{{ form.as_p }}
 			<button type="submit" class="btn btn-info mt-2">Se connecter</button>
 		</form>
+
 		<p class="mt-3">Pas encore de compte ? <a href="{% url 'register' %}">Créer un compte</a></p>
 	</div>
 </body>
