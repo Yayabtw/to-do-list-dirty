@@ -142,6 +142,12 @@ FRANCE_CONNECT_CLIENT_ID = '211286433e39cce01db448d80181bdfd005554b19cd51b3fe794
 FRANCE_CONNECT_CLIENT_SECRET = '2791a731e6a59f56b6b4dd0d08c9b1f593b5f3658b9fd731cb24248e2669af4b'
 FRANCE_CONNECT_REDIRECT_URI = 'http://localhost:3000/callback'
 
+# Google OAuth2
+# Configurer l'URI de redirection dans Google Cloud Console : http://localhost:3000/google-callback/
+GOOGLE_CLIENT_ID = '911298525524-j2vpiv7sviho5oq45lqi1frdht8fcn2u.apps.googleusercontent.com'
+GOOGLE_CLIENT_SECRET = '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'
+GOOGLE_REDIRECT_URI = 'http://localhost:3000/google-callback/'
+
 # Auth Django
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'list'

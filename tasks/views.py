@@ -10,7 +10,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import FranceConnectProfile, Series
+from .models import FranceConnectProfile, GoogleProfile, Series
 
 TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 
@@ -27,15 +27,15 @@ PROVIDER_LABELS = {
 }
 
 
-def _fetch_series_from_tmdb(provider_key, count=10):
+def _fetch_series_from_tmdb(provider_key, user, count=10):
     """Fetch top-rated series from TMDB for a given provider.
 
-    Returns up to `count` series that are NOT already in the database,
+    Returns up to `count` series that are NOT already in the user's watchlist,
     by paginating through TMDB results as needed.
     """
     provider_id = PROVIDER_IDS[provider_key]
     existing_tmdb_ids = set(
-        Series.objects.filter(tmdb_id__isnull=False)
+        Series.objects.filter(user=user, tmdb_id__isnull=False)
         .values_list('tmdb_id', flat=True)
     )
 
@@ -147,7 +147,7 @@ def import_series(request, provider):
         return redirect('list')
 
     try:
-        new_series = _fetch_series_from_tmdb(provider, count=10)
+        new_series = _fetch_series_from_tmdb(provider, request.user, count=10)
 
         created_count = 0
         for s in new_series:
@@ -325,4 +325,112 @@ def france_connect_callback(request):
 
     auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
     messages.success(request, "Connexion réussie avec France Connect.")
+    return redirect(settings.LOGIN_REDIRECT_URL)
+
+
+def google_authorize(request):
+    """Redirige vers l'endpoint d'autorisation Google OAuth2."""
+    state = secrets.token_urlsafe(32)
+    request.session['google_oauth_state'] = state
+
+    params = {
+        'response_type': 'code',
+        'client_id': settings.GOOGLE_CLIENT_ID,
+        'redirect_uri': settings.GOOGLE_REDIRECT_URI,
+        'scope': 'openid email profile',
+        'state': state,
+    }
+    url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
+    return redirect(url)
+
+
+def google_callback(request):
+    """
+    Callback Google : échange du code contre un token, récupération userinfo,
+    puis création du compte si inconnu et connexion.
+    """
+    state_sent = request.session.pop('google_oauth_state', None)
+    code = request.GET.get('code')
+    state_received = request.GET.get('state')
+    error = request.GET.get('error')
+
+    if error:
+        messages.error(
+            request,
+            f"Google a renvoyé une erreur : {error}. "
+            "Vérifiez la configuration (redirect_uri, client_id)."
+        )
+        return redirect('login')
+
+    if not code or state_sent is None or state_received != state_sent:
+        messages.error(request, "Paramètres de retour Google invalides.")
+        return redirect('login')
+
+    # Échange code -> token
+    token_url = 'https://oauth2.googleapis.com/token'
+    token_data = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': settings.GOOGLE_REDIRECT_URI,
+        'client_id': settings.GOOGLE_CLIENT_ID,
+        'client_secret': settings.GOOGLE_CLIENT_SECRET,
+    }
+    try:
+        token_resp = requests.post(token_url, data=token_data, timeout=10)
+        token_resp.raise_for_status()
+        token_json = token_resp.json()
+    except requests.RequestException as e:
+        messages.error(request, f"Erreur lors de l'échange du code Google : {e}")
+        return redirect('login')
+
+    access_token = token_json.get('access_token')
+    if not access_token:
+        messages.error(request, "Google n'a pas renvoyé de jeton d'accès.")
+        return redirect('login')
+
+    # Récupération des infos utilisateur (userinfo)
+    userinfo_url = 'https://www.googleapis.com/oauth2/v3/userinfo'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    try:
+        userinfo_resp = requests.get(userinfo_url, headers=headers, timeout=10)
+        userinfo_resp.raise_for_status()
+        userinfo = userinfo_resp.json()
+    except requests.RequestException as e:
+        messages.error(request, "Impossible de récupérer les informations Google.")
+        return redirect('login')
+
+    # Google renvoie "sub" (OpenID Connect) ou "id"
+    sub = userinfo.get('sub') or userinfo.get('id')
+    if not sub:
+        messages.error(request, "Identifiant Google (sub) manquant.")
+        return redirect('login')
+
+    # Liaison ou création du compte
+    try:
+        profile = GoogleProfile.objects.get(sub=sub)
+        user = profile.user
+    except GoogleProfile.DoesNotExist:
+        given_name = userinfo.get('given_name') or ''
+        family_name = userinfo.get('family_name') or ''
+        email = userinfo.get('email') or ''
+        base_username = f"google_{sub}"[:150]
+        username = base_username
+        idx = 0
+        while User.objects.filter(username=username).exists():
+            idx += 1
+            username = f"{base_username}_{idx}"[:150]
+
+        user = User.objects.create_user(
+            username=username,
+            email=email or f"{username}@google.local",
+            first_name=given_name,
+            last_name=family_name,
+            password=None,
+        )
+        user.set_unusable_password()
+        user.save()
+        GoogleProfile.objects.create(user=user, sub=sub)
+
+    auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    messages.success(request, "Connexion réussie avec Google.")
     return redirect(settings.LOGIN_REDIRECT_URL)

@@ -20,6 +20,24 @@ class FranceConnectProfile(models.Model):
         return f"FC {self.sub} → {self.user.username}"
 
 
+class GoogleProfile(models.Model):
+    """Liaison entre un utilisateur Django et un identifiant Google (sub)."""
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='google_profile',
+    )
+    sub = models.CharField(max_length=255, unique=True, db_index=True)
+
+    class Meta:
+        verbose_name = 'Profil Google'
+        verbose_name_plural = 'Profils Google'
+
+    def __str__(self):
+        return f"Google {self.sub} → {self.user.username}"
+
+
 class Series(models.Model):
     """Model representing a TV series in the watchlist."""
 
