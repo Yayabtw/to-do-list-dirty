@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-=8e&h2naz6*na6mne4y8l1m@rr=(igde^7rz2cmal)r_o)raoo
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -131,3 +131,24 @@ VERSION = '2.0.0'
 # Get your API token at https://www.themoviedb.org/settings/api
 # Use the "API Read Access Token" (Bearer token)
 TMDB_API_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4MmM3N2JiNTVlZjI5NmIyYWQ4NmI1NzhkN2NlMTc1OSIsIm5iZiI6MTc3MTMxNzUwNC43MjgsInN1YiI6IjY5OTQyOTAwMTExNTM1YmRkOWZhM2M5ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.9_DvZrGSon127reVShvDBhAA-oy4xZjUIzd46m2R-m4'
+
+# France Connect (API v1 - intégration)
+# Clé d'intégration : https://partenaires.franceconnect.gouv.fr/fcp/fournisseur-service
+# Callbacks autorisés : localhost 3000, 8080, 4242, 1337. On utilise 3000 (8080 est souvent pris par Apache).
+# Lancer Django sur le port 3000 : pipenv run python manage.py runserver 3000
+# Puis ouvrir http://localhost:3000/
+FRANCE_CONNECT_BASE_URL = 'https://fcp.integ01.dev-franceconnect.fr'
+FRANCE_CONNECT_CLIENT_ID = '211286433e39cce01db448d80181bdfd005554b19cd51b3fe7943f6b3b86ab6e'
+FRANCE_CONNECT_CLIENT_SECRET = '2791a731e6a59f56b6b4dd0d08c9b1f593b5f3658b9fd731cb24248e2669af4b'
+FRANCE_CONNECT_REDIRECT_URI = 'http://localhost:3000/callback'
+
+# Google OAuth2
+# Configurer l'URI de redirection dans Google Cloud Console : http://localhost:3000/google-callback/
+GOOGLE_CLIENT_ID = '911298525524-j2vpiv7sviho5oq45lqi1frdht8fcn2u.apps.googleusercontent.com'
+GOOGLE_CLIENT_SECRET = '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'
+GOOGLE_REDIRECT_URI = 'http://localhost:3000/google-callback/'
+
+# Auth Django
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'list'
+LOGOUT_REDIRECT_URL = 'list'

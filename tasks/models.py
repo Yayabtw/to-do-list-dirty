@@ -1,4 +1,41 @@
+from django.conf import settings
 from django.db import models
+
+
+class FranceConnectProfile(models.Model):
+    """Liaison entre un utilisateur Django et un identifiant France Connect (sub)."""
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='france_connect_profile',
+    )
+    sub = models.CharField(max_length=255, unique=True, db_index=True)
+
+    class Meta:
+        verbose_name = 'Profil France Connect'
+        verbose_name_plural = 'Profils France Connect'
+
+    def __str__(self):
+        return f"FC {self.sub} → {self.user.username}"
+
+
+class GoogleProfile(models.Model):
+    """Liaison entre un utilisateur Django et un identifiant Google (sub)."""
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='google_profile',
+    )
+    sub = models.CharField(max_length=255, unique=True, db_index=True)
+
+    class Meta:
+        verbose_name = 'Profil Google'
+        verbose_name_plural = 'Profils Google'
+
+    def __str__(self):
+        return f"Google {self.sub} → {self.user.username}"
 
 
 class Series(models.Model):
@@ -11,6 +48,13 @@ class Series(models.Model):
         ('manual', 'Ajout manuel'),
     ]
 
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='series',
+        null=True,
+        blank=True,
+    )
     title = models.CharField(max_length=200)
     tmdb_id = models.IntegerField(unique=True, null=True, blank=True)
     overview = models.TextField(blank=True, default='')

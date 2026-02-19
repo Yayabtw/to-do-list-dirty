@@ -12,4 +12,12 @@ urlpatterns = [
         views.import_series,
         name="import_series",
     ),
+    # Authentification
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('register/', views.register_view, name='register'),
+    path('france-connect/', views.france_connect_authorize, name='france_connect_authorize'),
+    path('callback', views.france_connect_callback, name='france_connect_callback'),
+    path('google/', views.google_authorize, name='google_authorize'),
+    path('google-callback/', views.google_callback, name='google_callback'),
 ]
